@@ -1,6 +1,5 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export interface CartItem {
@@ -43,7 +42,6 @@ interface CartProviderProps {
 
 export function CartProvider({ children }: CartProviderProps) {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const navigate = useNavigate();
   
   // Load cart from localStorage on initial render
   useEffect(() => {
@@ -93,7 +91,13 @@ export function CartProvider({ children }: CartProviderProps) {
       
       // Show toast notification with item added to cart
       toast(
-        <div onClick={() => navigate('/cart')} className="cursor-pointer">
+        <div 
+          onClick={() => {
+            // Use window.location instead of navigate
+            window.location.href = '/cart';
+          }} 
+          className="cursor-pointer"
+        >
           <p className="font-medium">Added to cart</p>
           <p className="text-sm text-gray-200">{item.quantity} × {item.name} added to your cart</p>
         </div>,
