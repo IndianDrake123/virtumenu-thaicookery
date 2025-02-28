@@ -44,7 +44,7 @@ const ThankYou = () => {
       <div className="flex flex-col">
         <span className="font-medium">Registration successful!</span>
         <span className="text-sm text-gray-500">
-          You'll receive 19% off your next order
+          You'll receive 10% off your next order
         </span>
       </div>,
       { duration: 4000 }
@@ -123,7 +123,7 @@ const ThankYou = () => {
           </div>
           
           <p className="text-gray-400 mb-4">
-            Register now to receive <span className="text-red-500 font-medium">19% off</span> your next order!
+            Register now to receive <span className="text-red-500 font-medium">10% off</span> your next order!
           </p>
           
           {!isSubmitted ? (
@@ -195,7 +195,7 @@ const ThankYou = () => {
                 onClick={handleSubmitContact}
                 className="w-full bg-red-600 hover:bg-red-700 h-12 text-white font-medium rounded-lg transition-colors"
               >
-                Register & Get 19% Off
+                Register & Get 10% Off
               </Button>
               
               <p className="text-gray-500 text-xs text-center mt-3">
@@ -214,7 +214,7 @@ const ThankYou = () => {
                 Thank You for Registering!
               </h3>
               <p className="text-gray-400 text-sm">
-                You'll receive 19% off your next order. We've sent a confirmation to 
+                You'll receive 10% off your next order. We've sent a confirmation to 
                 {contactMethod === 'phone' 
                   ? ` ${phoneNumber}`
                   : ` ${email}`
