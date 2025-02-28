@@ -29,6 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [animationDirection, setAnimationDirection] = useState<'left' | 'right'>('left');
   const [placeholderVisible, setPlaceholderVisible] = useState(true);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -55,6 +56,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   useEffect(() => {
     if (!isSearchActive && !isExpanded) {
       const interval = setInterval(() => {
+        // Alternate direction for each animation
+        setAnimationDirection(prev => prev === 'left' ? 'right' : 'left');
+        
         // Start fade out animation
         setIsAnimating(true);
         setPlaceholderVisible(false);
@@ -67,9 +71,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
           // Reset animation state after completing the transition
           setTimeout(() => {
             setIsAnimating(false);
-          }, 500); // Longer duration for smoother transition
-        }, 500); // Longer duration for smoother transition
-      }, 6000); // Slightly longer display time
+          }, 600);
+        }, 600);
+      }, 10000); // Change every 10 seconds as requested
       
       return () => clearInterval(interval);
     }
@@ -255,8 +259,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Always update the query state with input value
     setQuery(e.target.value);
-    // When user starts typing, clear any displayed query
+    
+    // When user starts typing in search mode, clear the display query
     if (isSearchActive) {
       setDisplayQuery('');
     }
@@ -266,7 +272,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     <div ref={searchRef} className="relative animate-fade-in">
       <div className="relative flex items-center">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <MessageCircle size={20} className="text-gray-400" />
+          <MessageCircle size={20} className="text-[#CA3F3F] animate-pulse-subtle" />
         </div>
         
         <input
@@ -288,8 +294,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {!isSearchActive && !query && !displayQuery && (
           <div className="absolute inset-y-0 left-0 pl-10 flex items-center pointer-events-none overflow-hidden">
             <span 
-              className={`text-gray-400 transition-all duration-500 ease-in-out ${
-                placeholderVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-6'
+              className={`text-gray-400 transition-all duration-600 ease-in-out ${
+                placeholderVisible 
+                  ? 'opacity-100 transform translate-y-0' 
+                  : `opacity-0 transform ${animationDirection === 'left' 
+                      ? '-translate-y-8' 
+                      : 'translate-y-8'}`
               }`}
             >
               {faqs[placeholderIndex]?.text}
