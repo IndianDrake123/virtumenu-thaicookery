@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Minus, Plus, Trash2, ArrowLeft, Clock } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import CartSummary from "@/components/CartSummary";
 import { Link, useNavigate } from "react-router-dom";
 import { trackUserInteraction } from "@/utils/analytics";
 
@@ -99,7 +98,7 @@ const Cart = () => {
                 <Clock size={18} className="text-[#CA3F3F]" />
               </div>
               <div>
-                <p className="text-white text-sm font-medium">Estimated Preparation Time</p>
+                <p className="text-white text-sm font-medium">Expected Time Until Ready</p>
                 <p className="text-[#CA3F3F] font-semibold text-lg">
                   {estimatedPrepTime} minutes
                 </p>

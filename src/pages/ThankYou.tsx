@@ -89,7 +89,7 @@ const ThankYou = () => {
             <div className="bg-[#CA3F3F]/20 p-2 rounded-full">
               <Clock size={20} className="text-[#CA3F3F]" />
             </div>
-            <h2 className="text-lg font-medium text-white">Estimated Preparation Time</h2>
+            <h2 className="text-lg font-medium text-white">Expected Time Until Ready</h2>
           </div>
           
           <div className="text-center py-2">
