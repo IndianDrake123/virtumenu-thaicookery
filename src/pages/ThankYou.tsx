@@ -2,8 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Phone, Mail, Star, Gift, MessageSquare, Send } from 'lucide-react';
+import { ArrowLeft, Phone, Mail, Gift } from 'lucide-react';
 import { trackUserInteraction } from '@/utils/analytics';
 import { toast } from 'sonner';
 
@@ -15,9 +14,6 @@ const ThankYou = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
-  const [noteToOwner, setNoteToOwner] = useState('');
-  const [isNoteSent, setIsNoteSent] = useState(false);
-  const [showNoteForm, setShowNoteForm] = useState(false);
   
   useEffect(() => {
     // Track page view
@@ -48,7 +44,7 @@ const ThankYou = () => {
       <div className="flex flex-col">
         <span className="font-medium">Registration successful!</span>
         <span className="text-sm text-gray-500">
-          You'll receive 10% off your next order
+          You'll receive 19% off your next order
         </span>
       </div>,
       { duration: 4000 }
@@ -60,55 +56,25 @@ const ThankYou = () => {
     trackUserInteraction('set_rating', { rating: index });
   };
   
-  const handleSendNote = () => {
-    if (noteToOwner.trim().length < 5) {
-      toast.error('Please enter a note with at least 5 characters');
-      return;
-    }
-    
-    // Track the note submission
-    trackUserInteraction('submit_note', { noteLength: noteToOwner.length });
-    
-    // In a real app, this would send the note to the owner
-    setIsNoteSent(true);
-    
-    toast.success('Your note has been sent to the owner. Thank you for your feedback!', {
-      duration: 4000
-    });
-  };
-  
   return (
     <div className="bg-black min-h-screen text-white">
       {/* Custom Header */}
       <header className="sticky top-0 z-40 px-4 py-3 bg-black/90 backdrop-blur-md shadow-lg">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center">
           <button 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/')}
             className="text-white flex items-center hover:text-gray-300 transition-colors z-10"
           >
             <ArrowLeft size={20} className="mr-2" />
-            <span>Back</span>
+            <span>Back to Menu</span>
           </button>
-          
-          <div className="absolute left-0 right-0 mx-auto flex justify-center">
-            <h1 className="text-lg font-medium">Thank You</h1>
-          </div>
-          
-          <div className="flex items-center">
-            <img 
-              src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
-              alt="Thai Cookery Logo" 
-              className="h-9 w-9 rounded-full shadow-md"
-              onClick={() => navigate('/about')}
-            />
-          </div>
         </div>
       </header>
       
       <main className="px-4 pt-8 pb-16 max-w-md mx-auto">
         {/* Logo and Title */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="bg-gradient-to-r from-red-800 to-red-600 p-2 rounded-full mb-5 shadow-lg">
+        <div className="flex flex-col items-center mb-10">
+          <div className="bg-gradient-to-r from-red-800 to-red-600 p-2 rounded-full mb-7 shadow-lg">
             <img 
               src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
@@ -120,11 +86,11 @@ const ThankYou = () => {
             Thank You for Eating at Thai Cookery!
           </h1>
           
-          <p className="text-gray-400 text-center mb-4">
+          <p className="text-gray-400 text-center mb-6">
             Your order has been confirmed and will be delivered soon.
           </p>
           
-          {/* Interactive Star Rating */}
+          {/* Star Rating */}
           <div className="flex items-center justify-center space-x-2 mb-6">
             {[1, 2, 3, 4, 5].map((starIndex) => (
               <button 
@@ -134,15 +100,16 @@ const ThankYou = () => {
                 onMouseLeave={() => setHoverRating(0)}
                 onClick={() => handleRatingClick(starIndex)}
               >
-                <Star 
-                  size={28} 
-                  className={`
-                    ${(hoverRating >= starIndex || rating >= starIndex) 
-                      ? 'text-red-500 fill-red-500' 
-                      : 'text-gray-600 fill-black'} 
-                    transition-colors duration-150
-                  `} 
-                />
+                <svg 
+                  width="30" 
+                  height="30" 
+                  viewBox="0 0 24 24" 
+                  fill={(hoverRating >= starIndex || rating >= starIndex) ? "#de4b4b" : "none"}
+                  stroke={(hoverRating >= starIndex || rating >= starIndex) ? "#de4b4b" : "#666"}
+                  className="transition-colors duration-150"
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               </button>
             ))}
           </div>
@@ -156,7 +123,7 @@ const ThankYou = () => {
           </div>
           
           <p className="text-gray-400 mb-4">
-            Register now to receive <span className="text-red-500 font-medium">10% off</span> your next order!
+            Register now to receive <span className="text-red-500 font-medium">19% off</span> your next order!
           </p>
           
           {!isSubmitted ? (
@@ -228,7 +195,7 @@ const ThankYou = () => {
                 onClick={handleSubmitContact}
                 className="w-full bg-red-600 hover:bg-red-700 h-12 text-white font-medium rounded-lg transition-colors"
               >
-                Register & Get 10% Off
+                Register & Get 19% Off
               </Button>
               
               <p className="text-gray-500 text-xs text-center mt-3">
@@ -247,74 +214,11 @@ const ThankYou = () => {
                 Thank You for Registering!
               </h3>
               <p className="text-gray-400 text-sm">
-                You'll receive 10% off your next order. We've sent a confirmation to 
+                You'll receive 19% off your next order. We've sent a confirmation to 
                 {contactMethod === 'phone' 
                   ? ` ${phoneNumber}`
                   : ` ${email}`
                 }
-              </p>
-            </div>
-          )}
-        </div>
-        
-        {/* Note to Owner Section */}
-        <div className="bg-gray-900/80 rounded-lg p-6 border border-gray-800 shadow-lg">
-          {!isNoteSent ? (
-            <>
-              <button 
-                onClick={() => setShowNoteForm(!showNoteForm)}
-                className="flex items-center w-full justify-between text-left focus:outline-none"
-              >
-                <div className="flex items-center">
-                  <MessageSquare size={20} className="text-red-500 mr-2" />
-                  <h2 className="text-lg font-medium">Leave a Note to the Owner</h2>
-                </div>
-                <svg 
-                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showNoteForm ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {showNoteForm && (
-                <div className="mt-4 animate-fade-in">
-                  <p className="text-gray-400 mb-3">
-                    Share your thoughts, feedback, or suggestions directly with the owner.
-                  </p>
-                  
-                  <Textarea
-                    value={noteToOwner}
-                    onChange={(e) => setNoteToOwner(e.target.value)}
-                    placeholder="What did you enjoy about your meal? Any suggestions for improvement?"
-                    className="w-full p-3 bg-gray-800 rounded-lg border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[120px] mb-3"
-                  />
-                  
-                  <Button
-                    onClick={handleSendNote}
-                    className="w-full bg-red-600 hover:bg-red-700 h-12 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
-                  >
-                    <Send size={16} className="mr-2" />
-                    Send Note to Owner
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-3">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-green-500/20 rounded-full mb-3">
-                <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-white mb-2">
-                Thank You for Your Feedback!
-              </h3>
-              <p className="text-gray-400 text-sm">
-                We appreciate you taking the time to share your thoughts with us. 
-                Your feedback helps us improve our service.
               </p>
             </div>
           )}
