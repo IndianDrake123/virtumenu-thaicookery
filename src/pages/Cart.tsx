@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { Minus, Plus, Trash2, ArrowLeft, Clock } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowLeft, Clock, Percent, DollarSign } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { trackUserInteraction } from "@/utils/analytics";
@@ -10,6 +10,8 @@ const Cart = () => {
   const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart, subtotal } = useCart();
   const [isLoaded, setIsLoaded] = useState(false);
+  const [taxInput, setTaxInput] = useState("9.5");
+  const [taxType, setTaxType] = useState<"percent" | "fixed">("percent");
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,6 +41,34 @@ const Cart = () => {
   };
   
   const estimatedPrepTime = calculatePrepTime();
+  
+  // Calculate tax based on input and type
+  const calculateTax = () => {
+    if (taxType === "percent") {
+      const percentage = parseFloat(taxInput) || 0;
+      return (subtotal * percentage) / 100;
+    } else {
+      return parseFloat(taxInput) || 0;
+    }
+  };
+
+  const tax = calculateTax();
+  const total = subtotal + tax;
+  
+  // Toggle between percentage and fixed amount
+  const toggleTaxType = () => {
+    if (taxType === "percent") {
+      // Convert current percentage to equivalent fixed amount
+      const fixedAmount = ((parseFloat(taxInput) || 0) * subtotal / 100).toFixed(2);
+      setTaxInput(fixedAmount);
+      setTaxType("fixed");
+    } else {
+      // Convert current fixed amount to equivalent percentage
+      const percentage = subtotal > 0 ? ((parseFloat(taxInput) || 0) / subtotal * 100).toFixed(1) : "0";
+      setTaxInput(percentage);
+      setTaxType("percent");
+    }
+  };
   
   // Save prep time to localStorage for use on thank you page
   useEffect(() => {
@@ -74,8 +104,11 @@ const Cart = () => {
             className="text-white flex items-center hover:text-[#CA3F3F] transition-colors active:text-[#CA3F3F]"
           >
             <ArrowLeft size={18} className="mr-2" />
-            <span>Your Cart</span>
           </button>
+          
+          <div className="absolute left-0 right-0 mx-auto flex justify-center pointer-events-none">
+            <h1 className="text-white font-medium">Your Cart</h1>
+          </div>
           
           <Link 
             to="/" 
@@ -194,26 +227,48 @@ const Cart = () => {
                 <span className="text-gray-300">Subtotal</span>
                 <span className="text-white font-medium">${subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-sm">
+              
+              {/* Interactive Tax Input */}
+              <div className="flex justify-between text-sm items-center">
                 <span className="text-gray-300">Tax</span>
-                <span className="text-white font-medium">${(subtotal * 0.095).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-300">Delivery</span>
-                <span className="text-white font-medium">Free</span>
+                <div className="flex items-center bg-black/30 rounded-lg pr-2 shadow-inner">
+                  <button 
+                    onClick={toggleTaxType}
+                    className="h-7 px-2 flex items-center justify-center text-gray-300 hover:text-white"
+                  >
+                    {taxType === "percent" ? <Percent size={14} /> : <DollarSign size={14} />}
+                  </button>
+                  <input
+                    type="text"
+                    value={taxInput}
+                    onChange={(e) => {
+                      // Only allow numbers and decimal point
+                      const regex = /^[0-9]*\.?[0-9]*$/;
+                      if (regex.test(e.target.value) || e.target.value === '') {
+                        setTaxInput(e.target.value);
+                      }
+                    }}
+                    className="w-14 bg-transparent border-none focus:outline-none text-right text-white font-medium"
+                    placeholder={taxType === "percent" ? "%" : "$"}
+                  />
+                  <span className="text-gray-400 ml-1">
+                    {taxType === "percent" ? "%" : ""}
+                  </span>
+                </div>
+                <span className="text-white font-medium ml-2">${tax.toFixed(2)}</span>
               </div>
             </div>
             
             <div className="border-t border-white/10 pt-3 mb-4">
               <div className="flex justify-between font-medium">
                 <span className="text-white">Total</span>
-                <span className="text-white text-lg">${(subtotal + subtotal * 0.095).toFixed(2)}</span>
+                <span className="text-white text-lg">${total.toFixed(2)}</span>
               </div>
             </div>
             
             <button 
               onClick={() => {
-                trackUserInteraction('checkout', { cartTotal: (subtotal + subtotal * 0.095).toFixed(2) });
+                trackUserInteraction('checkout', { cartTotal: total.toFixed(2) });
                 navigate('/checkout');
               }}
               className="w-full bg-[#CA3F3F] text-white font-medium py-3.5 rounded-lg hover:opacity-90 transition-transform transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
