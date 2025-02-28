@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { Minus, Plus, Trash2, ArrowLeft, Clock, Percent, DollarSign } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowLeft, Clock, Percent, DollarSign, Info } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { trackUserInteraction } from "@/utils/analytics";
@@ -12,6 +12,7 @@ const Cart = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [tipInput, setTipInput] = useState("15");
   const [tipType, setTipType] = useState<"percent" | "fixed">("percent");
+  const taxRate = 9.5; // 9.5% tax rate
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -42,6 +43,11 @@ const Cart = () => {
   
   const estimatedPrepTime = calculatePrepTime();
   
+  // Calculate tax amount
+  const calculateTax = () => {
+    return (subtotal * taxRate) / 100;
+  };
+  
   // Calculate tip based on input and type
   const calculateTip = () => {
     if (tipType === "percent") {
@@ -52,10 +58,11 @@ const Cart = () => {
     }
   };
 
+  const tax = calculateTax();
   const tip = calculateTip();
-  const total = subtotal + tip;
+  const total = subtotal + tax + tip;
   
-  // Toggle between percentage and fixed amount
+  // Toggle between percentage and fixed amount for tip
   const toggleTipType = () => {
     if (tipType === "percent") {
       // Convert current percentage to equivalent fixed amount
@@ -228,6 +235,12 @@ const Cart = () => {
                 <span className="text-white font-medium">${subtotal.toFixed(2)}</span>
               </div>
               
+              {/* Tax (Fixed) */}
+              <div className="flex justify-between text-sm items-center">
+                <span className="text-gray-300">Tax ({taxRate}%)</span>
+                <span className="text-white font-medium">${tax.toFixed(2)}</span>
+              </div>
+              
               {/* Interactive Tip Input */}
               <div className="flex justify-between text-sm items-center">
                 <span className="text-gray-300">Tip</span>
@@ -256,6 +269,12 @@ const Cart = () => {
                   </span>
                 </div>
                 <span className="text-white font-medium ml-2">${tip.toFixed(2)}</span>
+              </div>
+              
+              {/* Tip clarification message */}
+              <div className="flex text-xs text-gray-400 italic items-start">
+                <Info size={12} className="mr-1 mt-0.5 flex-shrink-0 text-gray-500" />
+                <span>Tip is calculated based on the subtotal amount before tax.</span>
               </div>
             </div>
             
