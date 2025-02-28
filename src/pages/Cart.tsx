@@ -77,6 +77,11 @@ const Cart = () => {
     }
   };
   
+  // Save tip amount to localStorage for checkout page
+  useEffect(() => {
+    localStorage.setItem('tipAmount', tip.toString());
+  }, [tip]);
+  
   // Save prep time to localStorage for use on thank you page
   useEffect(() => {
     if (estimatedPrepTime > 0) {
@@ -287,6 +292,12 @@ const Cart = () => {
             
             <button 
               onClick={() => {
+                // Save data to localStorage before navigating
+                localStorage.setItem('tipAmount', tip.toString());
+                localStorage.setItem('taxAmount', tax.toString());
+                localStorage.setItem('subtotalAmount', subtotal.toString());
+                localStorage.setItem('totalAmount', total.toString());
+                
                 trackUserInteraction('checkout', { cartTotal: total.toFixed(2) });
                 navigate('/checkout');
               }}
