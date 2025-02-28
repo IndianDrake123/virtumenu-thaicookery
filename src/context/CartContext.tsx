@@ -90,7 +90,7 @@ export function CartProvider({ children }: CartProviderProps) {
         updatedCart = [...prevCart, item];
       }
       
-      // Show toast notification with item added to cart
+      // Show toast notification with item added to cart - with enhanced red theme
       toast(
         <div 
           onClick={() => {
@@ -103,23 +103,23 @@ export function CartProvider({ children }: CartProviderProps) {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <p className="font-semibold text-[15px]">Added to cart</p>
-              <div className="bg-[#CA3F3F]/20 rounded-full px-2 py-0.5 flex items-center">
-                <Check size={12} className="text-[#CA3F3F] mr-1" />
-                <span className="text-xs text-[#CA3F3F] font-medium">Success</span>
+              <p className="font-semibold text-[15px] text-[#CA3F3F]">Added to cart</p>
+              <div className="bg-[#CA3F3F] rounded-full px-2 py-0.5 flex items-center">
+                <Check size={12} className="text-white mr-1" />
+                <span className="text-xs text-white font-medium">Success</span>
               </div>
             </div>
             <p className="text-sm opacity-90 mt-0.5">
               {item.quantity} × {item.name}
             </p>
-            <p className="text-xs mt-1 text-[#CA3F3F] underline">
+            <p className="text-xs mt-1 text-[#CA3F3F] font-semibold underline">
               Click to view cart
             </p>
           </div>
         </div>,
         {
           duration: 4000,
-          className: "bg-white text-black shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow",
+          className: "bg-white text-black shadow-xl border-l-4 border-[#CA3F3F] hover:shadow-2xl transition-shadow",
           position: "top-center",
           closeButton: true,
         }

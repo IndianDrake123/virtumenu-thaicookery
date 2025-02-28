@@ -152,8 +152,9 @@ function toast({ ...props }: Toast) {
   // Handle 'success' variant by converting it to 'default'
   let variant = props.variant
   
+  // Fix the TypeScript error by explicitly checking against all possible values
   if (variant === 'success') {
-    variant = 'default'
+    variant = 'default' as const; // Use type assertion to fix the error
   }
 
   const update = (props: ToasterToast) =>
