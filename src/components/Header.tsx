@@ -1,27 +1,31 @@
 
 import React, { useState, useEffect } from "react";
-import { Menu, Search, ChevronLeft } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Search } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "@/context/CartContext";
 
 interface HeaderProps {
   title?: string;
+  showBackButton?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ title }) => {
+const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isHome, setIsHome] = useState(true);
+  const { itemCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [headerTitle, setHeaderTitle] = useState(title || "VirtuMenu");
+  const [headerTitle, setHeaderTitle] = useState(title || "BCD Tofu House");
 
   useEffect(() => {
-    setIsHome(location.pathname === "/");
-    
-    if (location.pathname === "/") {
-      setHeaderTitle("VirtuMenu");
-    } else if (!title) {
-      const path = location.pathname.substring(1);
-      setHeaderTitle(path.charAt(0).toUpperCase() + path.slice(1));
+    if (!title) {
+      if (location.pathname === "/") {
+        setHeaderTitle("BCD Tofu House");
+      } else if (location.pathname === "/cart") {
+        setHeaderTitle("Your Order");
+      } else {
+        const path = location.pathname.split("/").pop() || "";
+        setHeaderTitle(path.charAt(0).toUpperCase() + path.slice(1));
+      }
     } else {
       setHeaderTitle(title);
     }
@@ -38,35 +42,54 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
     navigate(-1);
   };
 
+  const handleCartClick = () => {
+    navigate("/cart");
+  };
+
   return (
     <header 
       className={`sticky top-0 z-40 px-4 py-4 transition-all duration-300 ${
         isScrolled 
-          ? "bg-white bg-opacity-80 backdrop-blur-md shadow-sm" 
+          ? "bg-white bg-opacity-90 backdrop-blur-md shadow-sm" 
           : "bg-transparent"
       }`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          {!isHome ? (
+          {showBackButton && location.pathname !== "/" && (
             <button 
               onClick={handleBack}
-              className="p-2 rounded-full hover:bg-virtumenu-100 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Go back"
             >
-              <ChevronLeft size={24} className="text-virtumenu-800" />
-            </button>
-          ) : (
-            <button className="p-2 rounded-full hover:bg-virtumenu-100 transition-colors">
-              <Menu size={24} className="text-virtumenu-800" />
+              <ArrowLeft size={22} className="text-gray-800" />
             </button>
           )}
           
-          <h1 className="text-xl font-semibold text-virtumenu-900">{headerTitle}</h1>
+          <h1 className="text-xl font-semibold text-gray-900">{headerTitle}</h1>
         </div>
         
-        <button className="p-2 rounded-full hover:bg-virtumenu-100 transition-colors">
-          <Search size={24} className="text-virtumenu-800" />
-        </button>
+        <div className="flex items-center space-x-2">
+          <button 
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            aria-label="Search"
+          >
+            <Search size={22} className="text-gray-800" />
+          </button>
+          
+          <button 
+            onClick={handleCartClick}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+            aria-label="Shopping cart"
+          >
+            <ShoppingBag size={22} className="text-gray-800" />
+            {itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {itemCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );

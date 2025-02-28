@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, UtensilsCrossed, MessageSquare, CreditCard, Settings } from "lucide-react";
+import { Home, UtensilsCrossed, ShoppingBag, User } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 
 const NavigationBar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { itemCount } = useCart();
   const [activeTab, setActiveTab] = useState("/");
 
   useEffect(() => {
@@ -19,8 +21,21 @@ const NavigationBar: React.FC = () => {
   const navItems = [
     { icon: <Home size={20} />, label: "Home", path: "/" },
     { icon: <UtensilsCrossed size={20} />, label: "Menu", path: "/menu" },
-    { icon: <MessageSquare size={20} />, label: "Chat", path: "/chatbot" },
-    { icon: <CreditCard size={20} />, label: "Pay", path: "/payment" },
+    { 
+      icon: (
+        <div className="relative">
+          <ShoppingBag size={20} />
+          {itemCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+              {itemCount > 9 ? '9+' : itemCount}
+            </span>
+          )}
+        </div>
+      ), 
+      label: "Cart", 
+      path: "/cart" 
+    },
+    { icon: <User size={20} />, label: "Account", path: "/account" },
   ];
 
   return (
@@ -32,14 +47,14 @@ const NavigationBar: React.FC = () => {
             onClick={() => navigateTo(item.path)}
             className={`flex flex-col items-center py-2 px-5 rounded-lg transition-all duration-300 ${
               activeTab === item.path
-                ? "text-virtumenu-800 scale-105"
-                : "text-virtumenu-400 hover:text-virtumenu-600"
+                ? "text-primary scale-105"
+                : "text-gray-400 hover:text-gray-600"
             }`}
           >
             {item.icon}
             <span className="text-xs mt-1 font-medium">{item.label}</span>
             {activeTab === item.path && (
-              <span className="absolute bottom-1 w-1.5 h-1.5 bg-virtumenu-accent-500 rounded-full" />
+              <span className="absolute bottom-1 w-1.5 h-1.5 bg-primary rounded-full" />
             )}
           </button>
         ))}
