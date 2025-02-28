@@ -1,4 +1,3 @@
-
 import * as React from "react"
 
 import type {
@@ -146,10 +145,8 @@ function toast({ ...props }: Toast) {
   // Add custom styling class to make the toast more red
   const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
   
-  // Set success variant styling
-  if (props.variant === 'success') {
-    props.variant = 'default'
-  }
+  // Handle success variant (convert to default but keep the class styling)
+  const variant = props.variant === 'success' ? 'default' : props.variant
 
   const update = (props: ToasterToast) =>
     dispatch({
@@ -164,6 +161,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       className,
+      variant,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss()
