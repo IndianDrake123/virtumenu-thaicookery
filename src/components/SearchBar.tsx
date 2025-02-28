@@ -94,7 +94,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }, []);
 
   const handleSearch = (searchText: string = query || displayQuery) => {
-    if (!searchText.trim()) return;
+    // If search input is empty, clear search and return to default menu
+    if (!searchText.trim()) {
+      clearSearch();
+      return;
+    }
 
     // Track search interaction
     trackUserInteraction('search', { query: searchText });
