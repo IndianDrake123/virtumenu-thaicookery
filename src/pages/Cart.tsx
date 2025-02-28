@@ -10,8 +10,8 @@ const Cart = () => {
   const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart, subtotal } = useCart();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [taxInput, setTaxInput] = useState("9.5");
-  const [taxType, setTaxType] = useState<"percent" | "fixed">("percent");
+  const [tipInput, setTipInput] = useState("15");
+  const [tipType, setTipType] = useState<"percent" | "fixed">("percent");
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -42,31 +42,31 @@ const Cart = () => {
   
   const estimatedPrepTime = calculatePrepTime();
   
-  // Calculate tax based on input and type
-  const calculateTax = () => {
-    if (taxType === "percent") {
-      const percentage = parseFloat(taxInput) || 0;
+  // Calculate tip based on input and type
+  const calculateTip = () => {
+    if (tipType === "percent") {
+      const percentage = parseFloat(tipInput) || 0;
       return (subtotal * percentage) / 100;
     } else {
-      return parseFloat(taxInput) || 0;
+      return parseFloat(tipInput) || 0;
     }
   };
 
-  const tax = calculateTax();
-  const total = subtotal + tax;
+  const tip = calculateTip();
+  const total = subtotal + tip;
   
   // Toggle between percentage and fixed amount
-  const toggleTaxType = () => {
-    if (taxType === "percent") {
+  const toggleTipType = () => {
+    if (tipType === "percent") {
       // Convert current percentage to equivalent fixed amount
-      const fixedAmount = ((parseFloat(taxInput) || 0) * subtotal / 100).toFixed(2);
-      setTaxInput(fixedAmount);
-      setTaxType("fixed");
+      const fixedAmount = ((parseFloat(tipInput) || 0) * subtotal / 100).toFixed(2);
+      setTipInput(fixedAmount);
+      setTipType("fixed");
     } else {
       // Convert current fixed amount to equivalent percentage
-      const percentage = subtotal > 0 ? ((parseFloat(taxInput) || 0) / subtotal * 100).toFixed(1) : "0";
-      setTaxInput(percentage);
-      setTaxType("percent");
+      const percentage = subtotal > 0 ? ((parseFloat(tipInput) || 0) / subtotal * 100).toFixed(1) : "0";
+      setTipInput(percentage);
+      setTipType("percent");
     }
   };
   
@@ -228,34 +228,34 @@ const Cart = () => {
                 <span className="text-white font-medium">${subtotal.toFixed(2)}</span>
               </div>
               
-              {/* Interactive Tax Input */}
+              {/* Interactive Tip Input */}
               <div className="flex justify-between text-sm items-center">
-                <span className="text-gray-300">Tax</span>
+                <span className="text-gray-300">Tip</span>
                 <div className="flex items-center bg-black/30 rounded-lg pr-2 shadow-inner">
                   <button 
-                    onClick={toggleTaxType}
+                    onClick={toggleTipType}
                     className="h-7 px-2 flex items-center justify-center text-gray-300 hover:text-white"
                   >
-                    {taxType === "percent" ? <Percent size={14} /> : <DollarSign size={14} />}
+                    {tipType === "percent" ? <Percent size={14} /> : <DollarSign size={14} />}
                   </button>
                   <input
                     type="text"
-                    value={taxInput}
+                    value={tipInput}
                     onChange={(e) => {
                       // Only allow numbers and decimal point
                       const regex = /^[0-9]*\.?[0-9]*$/;
                       if (regex.test(e.target.value) || e.target.value === '') {
-                        setTaxInput(e.target.value);
+                        setTipInput(e.target.value);
                       }
                     }}
                     className="w-14 bg-transparent border-none focus:outline-none text-right text-white font-medium"
-                    placeholder={taxType === "percent" ? "%" : "$"}
+                    placeholder={tipType === "percent" ? "%" : "$"}
                   />
                   <span className="text-gray-400 ml-1">
-                    {taxType === "percent" ? "%" : ""}
+                    {tipType === "percent" ? "%" : ""}
                   </span>
                 </div>
-                <span className="text-white font-medium ml-2">${tax.toFixed(2)}</span>
+                <span className="text-white font-medium ml-2">${tip.toFixed(2)}</span>
               </div>
             </div>
             
