@@ -46,6 +46,10 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
     navigate("/cart");
   };
 
+  const handleMenuClick = () => {
+    navigate("/");
+  };
+
   return (
     <header 
       className={`sticky top-0 z-40 px-4 py-4 transition-all duration-300 ${
@@ -72,18 +76,28 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
         </div>
         
         <div className="flex items-center space-x-2">
-          <button 
-            onClick={handleCartClick}
-            className="p-2 rounded-full hover:bg-gray-800 transition-colors relative"
-            aria-label="Shopping cart"
-          >
-            <ShoppingBag size={22} className="text-white" />
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-[#CA3F3F] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </button>
+          {location.pathname === "/cart" ? (
+            <button 
+              onClick={handleMenuClick}
+              className="p-2 rounded-full hover:bg-gray-800 transition-colors relative text-white"
+              aria-label="Menu"
+            >
+              Menu
+            </button>
+          ) : (
+            <button 
+              onClick={handleCartClick}
+              className="p-2 rounded-full hover:bg-gray-800 transition-colors relative"
+              aria-label="Shopping cart"
+            >
+              <ShoppingBag size={22} className="text-white" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#CA3F3F] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </header>
