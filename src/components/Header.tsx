@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, ShoppingBag, Search } from "lucide-react";
+import { ArrowLeft, ShoppingBag } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 
@@ -14,12 +14,12 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
   const navigate = useNavigate();
   const { itemCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [headerTitle, setHeaderTitle] = useState(title || "BCD Tofu House");
+  const [headerTitle, setHeaderTitle] = useState(title || "Thai Cookery");
 
   useEffect(() => {
     if (!title) {
       if (location.pathname === "/") {
-        setHeaderTitle("BCD Tofu House");
+        setHeaderTitle("Thai Cookery");
       } else if (location.pathname === "/cart") {
         setHeaderTitle("Your Order");
       } else {
@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
     <header 
       className={`sticky top-0 z-40 px-4 py-4 transition-all duration-300 ${
         isScrolled 
-          ? "bg-white bg-opacity-90 backdrop-blur-md shadow-sm" 
+          ? "bg-black bg-opacity-90 backdrop-blur-md" 
           : "bg-transparent"
       }`}
     >
@@ -59,32 +59,27 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
           {showBackButton && location.pathname !== "/" && (
             <button 
               onClick={handleBack}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-800 transition-colors"
               aria-label="Go back"
             >
-              <ArrowLeft size={22} className="text-gray-800" />
+              <ArrowLeft size={22} className="text-white" />
             </button>
           )}
           
-          <h1 className="text-xl font-semibold text-gray-900">{headerTitle}</h1>
+          {headerTitle && headerTitle !== "Thai Cookery" && (
+            <h1 className="text-xl font-semibold text-white">{headerTitle}</h1>
+          )}
         </div>
         
         <div className="flex items-center space-x-2">
           <button 
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-            aria-label="Search"
-          >
-            <Search size={22} className="text-gray-800" />
-          </button>
-          
-          <button 
             onClick={handleCartClick}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+            className="p-2 rounded-full hover:bg-gray-800 transition-colors relative"
             aria-label="Shopping cart"
           >
-            <ShoppingBag size={22} className="text-gray-800" />
+            <ShoppingBag size={22} className="text-white" />
             {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-[#CA3F3F] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {itemCount}
               </span>
             )}

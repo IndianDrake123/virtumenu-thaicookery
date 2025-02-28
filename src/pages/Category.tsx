@@ -29,7 +29,18 @@ const Category = () => {
 
   return (
     <Layout title={category.name} showHeader={true}>
-      <div className={`space-y-4 ${isLoaded ? "animate-fade-in" : "opacity-0"}`}>
+      <div 
+        className={`space-y-4 ${isLoaded ? "animate-fade-in" : "opacity-0"}`}
+        style={{ backgroundColor: "#000000", color: "#FFFFFF", minHeight: "100vh" }}
+      >
+        {/* Category Header */}
+        <div className="bg-[#CA3F3F] py-4 px-4 mb-4">
+          <h2 className="text-xl font-bold text-white">{category.name}</h2>
+          {category.description && (
+            <p className="text-white/90 text-sm">{category.description}</p>
+          )}
+        </div>
+        
         <MenuCategory 
           category={category}
           expanded={true}

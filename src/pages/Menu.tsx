@@ -1,15 +1,14 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Layout from "@/components/Layout";
 import MenuCategory from "@/components/MenuCategory";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { menuCategories } from "@/data/menuData";
 
 const Menu = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeCategory, setActiveCategory] = useState("starters");
   const [isLoaded, setIsLoaded] = useState(false);
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,72 +18,94 @@ const Menu = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (categoryScrollRef.current) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      categoryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
   };
 
-  // Filter categories based on active tab
-  const filteredCategories = menuCategories.filter(category => {
-    if (activeTab === "all") return true;
-    if (activeTab === "popular") {
-      return category.items.some(item => item.popular);
-    }
-    return category.id === activeTab;
-  });
+  // Get the current selected category
+  const selectedCategory = menuCategories.find(cat => cat.id === activeCategory) || menuCategories[0];
 
   return (
-    <Layout title="Menu" showHeader={true}>
-      <div className={`space-y-6 ${isLoaded ? "animate-fade-in" : "opacity-0"}`}>
-        {/* Search Bar */}
-        <div className="menu-card p-2 flex items-center">
-          <div className="flex-1 px-2 relative">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-              <Search size={18} className="text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search menu..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border-none focus:outline-none focus:ring-1 focus:ring-primary focus:ring-opacity-50 bg-gray-50 text-gray-900 placeholder:text-gray-400"
-            />
+    <Layout title="" showHeader={true}>
+      <div className={`space-y-6 ${isLoaded ? "animate-fade-in" : "opacity-0"}`} style={{ backgroundColor: "#000000", color: "#FFFFFF", minHeight: "100vh" }}>
+        {/* Logo in the middle */}
+        <div className="flex justify-center py-4">
+          <img 
+            src="/lovable-uploads/200a4b3d-1a93-4c57-bd31-4fde23ab825d.png" 
+            alt="Thai Cookery Logo" 
+            className="h-24 w-24 rounded-full"
+          />
+        </div>
+        
+        <h1 className="text-2xl font-bold text-center text-white">Thai Cookery</h1>
+        
+        {/* Categories Scroll */}
+        <div className="relative px-2">
+          <button 
+            onClick={() => scrollCategories('left')} 
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 rounded-full p-1"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft size={24} className="text-white" />
+          </button>
+          
+          <div 
+            ref={categoryScrollRef}
+            className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {menuCategories.map((category) => (
+              <div 
+                key={category.id}
+                className={`flex-shrink-0 w-28 mx-2 snap-center cursor-pointer transition-all duration-300 ${
+                  activeCategory === category.id ? "scale-105" : "opacity-70"
+                }`}
+                onClick={() => setActiveCategory(category.id)}
+              >
+                <div className={`aspect-square rounded-lg overflow-hidden mb-2 border-2 ${
+                  activeCategory === category.id ? "border-white" : "border-transparent"
+                }`}>
+                  <div className="w-full h-full flex items-center justify-center bg-[#CA3F3F] text-white">
+                    {category.image ? (
+                      <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-lg font-medium">{category.name.charAt(0)}</span>
+                    )}
+                  </div>
+                </div>
+                <p className="text-sm text-center text-white font-medium truncate">{category.name}</p>
+              </div>
+            ))}
           </div>
-          <button className="p-2.5 ml-2 rounded-lg bg-gray-50 text-gray-800 hover:bg-gray-100 transition-colors">
-            <Filter size={20} />
+          
+          <button 
+            onClick={() => scrollCategories('right')} 
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 rounded-full p-1"
+            aria-label="Scroll right"
+          >
+            <ChevronRight size={24} className="text-white" />
           </button>
         </div>
 
-        {/* Categories Tabs */}
-        <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="w-full flex overflow-x-auto p-1 bg-white rounded-xl shadow-sm">
-            <TabsTrigger value="all" className="flex-1 py-2">
-              All
-            </TabsTrigger>
-            <TabsTrigger value="popular" className="flex-1 py-2">
-              Popular
-            </TabsTrigger>
-            <TabsTrigger value="soon-tofu" className="flex-1 py-2">
-              Soon Tofu
-            </TabsTrigger>
-            <TabsTrigger value="bbq" className="flex-1 py-2">
-              BBQ
-            </TabsTrigger>
-            <TabsTrigger value="appetizers" className="flex-1 py-2">
-              Appetizers
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Active Category Header */}
+        <div className="bg-[#CA3F3F] py-4 px-4 rounded-t-xl">
+          <h2 className="text-xl font-bold text-white">{selectedCategory.name}</h2>
+          {selectedCategory.description && (
+            <p className="text-white/90 text-sm">{selectedCategory.description}</p>
+          )}
+        </div>
 
-        {/* Menu Categories */}
-        <div className="space-y-6">
-          {filteredCategories.map((category) => (
-            <MenuCategory
-              key={category.id}
-              category={category}
-              expanded={filteredCategories.length === 1}
-              showViewAll={true}
-            />
-          ))}
+        {/* Menu Items for Selected Category */}
+        <div className="space-y-3 px-2">
+          <MenuCategory
+            key={selectedCategory.id}
+            category={selectedCategory}
+            expanded={true}
+            showViewAll={false}
+          />
         </div>
       </div>
     </Layout>

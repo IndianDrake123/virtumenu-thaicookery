@@ -33,11 +33,11 @@ const Layout: React.FC<LayoutProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-black">
       {showHeader && <Header title={title} showBackButton={showBackButton} />}
       
       <main 
-        className={`flex-1 px-4 pb-24 pt-4 transition-opacity duration-500 ease-in-out ${
+        className={`flex-1 pt-2 pb-20 transition-opacity duration-500 ease-in-out ${
           isLoaded ? "opacity-100" : "opacity-0"
         }`}
       >
