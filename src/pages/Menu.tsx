@@ -5,6 +5,7 @@ import MenuCategory from "@/components/MenuCategory";
 import SearchBar from "@/components/SearchBar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { menuCategories } from "@/data/menuData";
+import MenuItem from "@/components/MenuItem";
 
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState("starters");

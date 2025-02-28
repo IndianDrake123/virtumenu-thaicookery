@@ -156,11 +156,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
     // Filter for items that would be quick to prepare
     const quickItems = menuCategories
       .flatMap(category => category.items)
-      .filter(item => 
-        category.id === 'starters' || 
-        category.id === 'soups' || 
-        item.name.toLowerCase().includes('fried rice')
-      );
+      .filter(item => {
+        const categoryId = menuCategories.find(cat => 
+          cat.items.some(i => i.id === item.id)
+        )?.id;
+        
+        return categoryId === 'starters' || 
+               categoryId === 'soups' || 
+               item.name.toLowerCase().includes('fried rice');
+      });
 
     return {
       title: "Quick Lunch Options",
