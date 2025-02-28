@@ -25,12 +25,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
   isSearchActive = false
 }) => {
   const [query, setQuery] = useState('');
+  const [displayQuery, setDisplayQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [placeholderVisible, setPlaceholderVisible] = useState(true);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Update displayQuery when currentSearchQuery changes
+  useEffect(() => {
+    if (isSearchActive && currentSearchQuery) {
+      setDisplayQuery(currentSearchQuery);
+    } else {
+      setDisplayQuery('');
+    }
+  }, [isSearchActive, currentSearchQuery]);
   
   const faqs: SearchSuggestion[] = [
     { id: 'popular', text: 'What is the most popular dish?', type: 'faq', icon: <Award size={16} className="text-amber-400" /> },
@@ -57,9 +67,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
           // Reset animation state after completing the transition
           setTimeout(() => {
             setIsAnimating(false);
-          }, 300);
-        }, 300);
-      }, 5000);
+          }, 500); // Longer duration for smoother transition
+        }, 500); // Longer duration for smoother transition
+      }, 6000); // Slightly longer display time
       
       return () => clearInterval(interval);
     }
@@ -79,7 +89,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     };
   }, []);
 
-  const handleSearch = (searchText: string = query) => {
+  const handleSearch = (searchText: string = query || displayQuery) => {
     if (!searchText.trim()) return;
 
     // Track search interaction
@@ -240,7 +250,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const clearSearch = () => {
     setQuery('');
+    setDisplayQuery('');
     onClear();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    // When user starts typing, clear any displayed query
+    if (isSearchActive) {
+      setDisplayQuery('');
+    }
   };
 
   return (
@@ -253,24 +272,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <input
           ref={inputRef}
           type="text"
-          value={isSearchActive ? currentSearchQuery : query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={query || displayQuery}
+          onChange={handleInputChange}
           onFocus={() => setIsExpanded(true)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           placeholder={
-            isSearchActive 
-              ? '' 
+            isSearchActive && currentSearchQuery
+              ? currentSearchQuery
               : faqs[placeholderIndex]?.text
           }
-          className="block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all shadow-lg"
+          className="block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all duration-500 shadow-lg hover:shadow-xl"
         />
         
         {/* Animated placeholder text that transitions between suggestions */}
-        {!isSearchActive && !query && (
+        {!isSearchActive && !query && !displayQuery && (
           <div className="absolute inset-y-0 left-0 pl-10 flex items-center pointer-events-none overflow-hidden">
             <span 
-              className={`text-gray-400 transition-all duration-300 ease-in-out ${
-                placeholderVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-4'
+              className={`text-gray-400 transition-all duration-500 ease-in-out ${
+                placeholderVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-6'
               }`}
             >
               {faqs[placeholderIndex]?.text}
@@ -278,10 +297,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </div>
         )}
         
-        {(query || isSearchActive) && (
+        {(query || displayQuery) && (
           <button 
             onClick={clearSearch}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors duration-300"
           >
             <X className="h-5 w-5" />
           </button>
@@ -299,9 +318,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 <button
                   key={faq.id}
                   onClick={() => handleFaqClick(faq)}
-                  className="text-left p-2.5 rounded-md hover:bg-gray-700 transition-colors text-gray-300 hover:text-white flex items-center"
+                  className="text-left p-2.5 rounded-md hover:bg-gray-700 transition-colors duration-300 text-gray-300 hover:text-white flex items-center group"
                 >
-                  {faq.icon && <span className="mr-2">{faq.icon}</span>}
+                  {faq.icon && (
+                    <span className="mr-2 transition-transform duration-300 group-hover:scale-110">
+                      {faq.icon}
+                    </span>
+                  )}
                   <span>{faq.text}</span>
                 </button>
               ))}

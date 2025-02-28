@@ -144,15 +144,15 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s cubic-bezier(0.15, 1, 0.3, 1);
+  animation: fadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .animate-fade-out {
-  animation: fadeOut 0.3s cubic-bezier(0.15, 1, 0.3, 1);
+  animation: fadeOut 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.5s cubic-bezier(0.15, 1, 0.3, 1);
+  animation: scaleIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 @keyframes fadeIn {
@@ -189,11 +189,11 @@
 }
 
 .animate-slide-in-bottom {
-  animation: slideInBottom 0.5s cubic-bezier(0.15, 1, 0.3, 1);
+  animation: slideInBottom 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.5s cubic-bezier(0.15, 1, 0.3, 1);
+  animation: slideInRight 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 @keyframes slideInBottom {
@@ -265,17 +265,17 @@
 
 /* Search placeholder transition animations */
 .search-placeholder-out {
-  animation: slideOutUp 0.3s cubic-bezier(0.15, 1, 0.3, 1) forwards;
+  animation: slideOutUp 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 .search-placeholder-in {
-  animation: slideInUp 0.3s cubic-bezier(0.15, 1, 0.3, 1) forwards;
+  animation: slideInUp 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
 }
 
 /* Make images load with blur effect */
 .img-blur-in {
   filter: blur(10px);
-  transition: filter 0.6s cubic-bezier(0.15, 1, 0.3, 1);
+  transition: filter 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .img-blur-in.loaded {
@@ -294,7 +294,7 @@
 
 /* Luxury card hover effect */
 .luxury-card {
-  transition: all 0.4s cubic-bezier(0.15, 1, 0.3, 1);
+  transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .luxury-card:hover {
@@ -304,11 +304,24 @@
 
 /* Subtle hover glow effect */
 .hover-glow {
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
 }
 
 .hover-glow:hover {
   box-shadow: 0 0 20px rgba(202, 63, 63, 0.4);
+}
+
+/* Luxury transition effects */
+.luxury-transition {
+  transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.luxury-shadow-hover {
+  transition: box-shadow 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.luxury-shadow-hover:hover {
+  box-shadow: 0 10px 30px rgba(202, 63, 63, 0.2);
 }
 
 /* Reduce motion if user prefers */
