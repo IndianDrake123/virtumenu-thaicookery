@@ -5,6 +5,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import CartSummary from "@/components/CartSummary";
 import { Link } from "react-router-dom";
+import { trackUserInteraction } from "@/utils/analytics";
 
 const Cart = () => {
   const { cart, updateQuantity, removeFromCart, subtotal } = useCart();
@@ -15,6 +16,9 @@ const Cart = () => {
       setIsLoaded(true);
     }, 100);
 
+    // Track page view
+    trackUserInteraction('page_view', { page: 'cart' });
+
     return () => clearTimeout(timer);
   }, []);
 
@@ -22,12 +26,12 @@ const Cart = () => {
     return (
       <Layout title="Your Cart" showHeader={true}>
         <div className={`flex flex-col items-center justify-center pt-16 px-4 ${isLoaded ? "animate-fade-in" : "opacity-0"}`}>
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <div className="w-24 h-24 bg-gray-100/10 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm border border-white/5">
             <Trash2 size={32} className="text-gray-400" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Your cart is empty</h2>
-          <p className="text-gray-500 text-center mb-8">Looks like you haven't added any items to your cart yet</p>
-          <Link to="/" className="btn-primary">
+          <h2 className="text-xl font-semibold text-white mb-2">Your cart is empty</h2>
+          <p className="text-gray-400 text-center mb-8">Looks like you haven't added any items to your cart yet</p>
+          <Link to="/" className="bg-[#CA3F3F] text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-transform transform hover:scale-[1.02] active:scale-[0.98] shadow-lg">
             Browse Menu
           </Link>
         </div>
@@ -36,19 +40,45 @@ const Cart = () => {
   }
 
   return (
-    <Layout title="Your Cart" showHeader={true}>
+    <Layout title="Your Cart" showHeader={false}>
       <div className={`space-y-4 ${isLoaded ? "animate-fade-in" : "opacity-0"}`}>
+        {/* Custom Header */}
+        <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-md py-3 px-4 flex justify-between items-center shadow-lg">
+          <button 
+            onClick={() => window.history.back()}
+            className="text-white flex items-center"
+          >
+            <Trash2 size={18} className="mr-2" />
+            <span>Your Cart</span>
+          </button>
+          
+          <Link 
+            to="/" 
+            className="flex items-center justify-center"
+            onClick={() => trackUserInteraction('navigate', { from: 'cart', to: 'menu' })}
+          >
+            <img 
+              src="/lovable-uploads/7961a339-d4e8-4220-8eda-b2b4ed4dff2c.png" 
+              alt="Thai Cookery Logo" 
+              className="h-9 w-9 rounded-full shadow-md"
+            />
+          </Link>
+        </div>
+        
         {/* Cart Items */}
-        <div className="space-y-4 mb-6">
+        <div className="space-y-2 mb-4 px-3">
           {cart.map((item) => (
-            <div key={item.id} className="bg-white rounded-xl p-4 shadow-sm flex flex-col">
-              <div className="flex justify-between">
+            <div 
+              key={item.id} 
+              className="bg-white/5 backdrop-blur-sm rounded-xl p-4 shadow-md flex flex-col border border-white/10 transform transition-all duration-300 hover:translate-y-[-2px]"
+            >
+              <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-medium text-gray-900">{item.name}</h3>
+                  <h3 className="font-medium text-white">{item.name}</h3>
                   {item.options && item.options.length > 0 && (
                     <div className="mt-1 space-y-1">
                       {item.options.map((option, idx) => (
-                        <p key={idx} className="text-sm text-gray-500">
+                        <p key={idx} className="text-sm text-gray-400">
                           {option.name}: {option.choice} 
                           {option.price ? ` (+$${option.price.toFixed(2)})` : ''}
                         </p>
@@ -56,36 +86,53 @@ const Cart = () => {
                     </div>
                   )}
                   {item.specialInstructions && (
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-400 mt-1">
                       Notes: {item.specialInstructions}
                     </p>
                   )}
                 </div>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-white bg-[#CA3F3F]/80 px-2 py-1 rounded-lg text-sm">
                   ${((item.price + (item.options?.reduce((sum, opt) => sum + (opt.price || 0), 0) || 0)) * item.quantity).toFixed(2)}
                 </p>
               </div>
               
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+              <div className="flex justify-between items-center mt-3 pt-3 border-t border-white/10">
                 <button 
-                  onClick={() => removeFromCart(item.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors"
+                  onClick={() => {
+                    removeFromCart(item.id);
+                    trackUserInteraction('remove_from_cart', { itemId: item.id, itemName: item.name });
+                  }}
+                  className="text-gray-400 hover:text-[#CA3F3F] transition-colors transform hover:scale-110"
                 >
                   <Trash2 size={18} />
                 </button>
                 
-                <div className="flex items-center">
+                <div className="flex items-center bg-black/30 rounded-lg p-1.5 shadow-inner">
                   <button
-                    onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600"
+                    onClick={() => {
+                      updateQuantity(item.id, Math.max(1, item.quantity - 1));
+                      trackUserInteraction('update_quantity', { 
+                        itemId: item.id, 
+                        itemName: item.name, 
+                        newQuantity: Math.max(1, item.quantity - 1) 
+                      });
+                    }}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-[#CA3F3F] text-white hover:opacity-90 disabled:opacity-50 shadow-md"
                     disabled={item.quantity <= 1}
                   >
                     <Minus size={16} />
                   </button>
-                  <span className="mx-3 font-medium text-gray-800">{item.quantity}</span>
+                  <span className="mx-3 font-medium text-white">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                    className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600"
+                    onClick={() => {
+                      updateQuantity(item.id, item.quantity + 1);
+                      trackUserInteraction('update_quantity', { 
+                        itemId: item.id, 
+                        itemName: item.name, 
+                        newQuantity: item.quantity + 1 
+                      });
+                    }}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-[#CA3F3F] text-white hover:opacity-90 shadow-md"
                   >
                     <Plus size={16} />
                   </button>
@@ -96,14 +143,53 @@ const Cart = () => {
         </div>
         
         {/* Order Summary */}
-        <CartSummary />
+        <div className="px-3">
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 shadow-md border border-white/10">
+            <h3 className="font-semibold text-white mb-4 border-b border-white/10 pb-2">Order Summary</h3>
+            
+            <div className="space-y-3 mb-4">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-300">Subtotal</span>
+                <span className="text-white font-medium">${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-300">Tax</span>
+                <span className="text-white font-medium">${(subtotal * 0.095).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-300">Delivery</span>
+                <span className="text-white font-medium">Free</span>
+              </div>
+            </div>
+            
+            <div className="border-t border-white/10 pt-3 mb-4">
+              <div className="flex justify-between font-medium">
+                <span className="text-white">Total</span>
+                <span className="text-white text-lg">${(subtotal + subtotal * 0.095).toFixed(2)}</span>
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => {
+                trackUserInteraction('checkout', { cartTotal: (subtotal + subtotal * 0.095).toFixed(2) });
+                window.location.href = '/checkout';
+              }}
+              className="w-full bg-[#CA3F3F] text-white font-medium py-3.5 rounded-lg hover:opacity-90 transition-transform transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+            >
+              Proceed to Checkout
+            </button>
+          </div>
+        </div>
         
-        <Link 
-          to="/"
-          className="block text-center text-primary font-medium py-2"
-        >
-          Add more items
-        </Link>
+        <div className="px-3 pb-6">
+          <Link 
+            to="/"
+            className="block text-center text-[#CA3F3F] font-medium py-3 bg-white/5 backdrop-blur-sm rounded-lg border border-[#CA3F3F]/20 hover:bg-white/10 transition-colors shadow-sm"
+            onClick={() => trackUserInteraction('add_more_items', {})}
+          >
+            Add more items
+          </Link>
+        </div>
       </div>
     </Layout>
   );

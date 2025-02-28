@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, AlertTriangle, Award, Zap, Clock, UserCheck, MessageSquare } from 'lucide-react';
+import { X, AlertTriangle, Award, Zap, Clock, UserCheck } from 'lucide-react';
 import { menuCategories } from '@/data/menuData';
 import { trackUserInteraction } from '@/utils/analytics';
 
@@ -213,7 +213,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
     <div ref={searchRef} className="relative animate-fade-in">
       <div className="relative flex items-center">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <MessageSquare className="h-5 w-5 text-gray-400" />
+          <img 
+            src="/lovable-uploads/52957af7-71a6-43d9-95bf-700564d3e1b9.png" 
+            alt="Chatbot" 
+            className="h-5 w-5"
+          />
         </div>
         
         <input
@@ -223,8 +227,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsExpanded(true)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder="What is the most popular dish"
-          className="block w-full pl-10 pr-12 py-3.5 bg-gray-800 border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all shadow-md"
+          placeholder="What is the most popular dish?"
+          className="block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all shadow-lg"
         />
         
         {query && (
@@ -239,7 +243,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
       
       {/* Expanded Search with FAQs */}
       {isExpanded && (
-        <div className="absolute top-full left-0 right-0 mt-2 py-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-40 max-h-96 overflow-y-auto animate-fade-in">
+        <div className="absolute top-full left-0 right-0 mt-2 py-2 bg-gray-800/95 backdrop-blur-md rounded-lg shadow-xl border border-gray-700/50 z-40 max-h-96 overflow-y-auto animate-fade-in">
           {/* FAQ suggestions */}
           <div className="px-4 py-2">
             <h3 className="text-sm font-medium text-gray-400 mb-2">Suggested searches</h3>

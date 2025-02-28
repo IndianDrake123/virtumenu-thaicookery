@@ -4,6 +4,7 @@ import { Plus, Minus, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { MenuItem as MenuItemType } from "@/data/menuData";
 import { useCart } from "@/context/CartContext";
+import { trackUserInteraction } from "@/utils/analytics";
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -19,6 +20,14 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // Track add to cart
+    trackUserInteraction('add_to_cart', { 
+      itemId: item.id, 
+      itemName: item.name, 
+      quantity: quantity, 
+      price: item.price 
+    });
     
     // If item has required options, navigate to the item details
     if (item.options?.some(option => option.required)) {
@@ -42,6 +51,13 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
     e.preventDefault();
     e.stopPropagation();
     setQuantity(prev => prev + 1);
+    
+    trackUserInteraction('adjust_quantity', { 
+      itemId: item.id, 
+      itemName: item.name, 
+      change: 'increment', 
+      newQuantity: quantity + 1 
+    });
   };
   
   const decrementQuantity = (e: React.MouseEvent) => {
@@ -49,6 +65,13 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
     e.stopPropagation();
     if (quantity > 1) {
       setQuantity(prev => prev - 1);
+      
+      trackUserInteraction('adjust_quantity', { 
+        itemId: item.id, 
+        itemName: item.name, 
+        change: 'decrement', 
+        newQuantity: quantity - 1 
+      });
     }
   };
 
@@ -56,6 +79,12 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
     e.preventDefault();
     e.stopPropagation();
     setExpanded(!expanded);
+    
+    trackUserInteraction('toggle_item_details', { 
+      itemId: item.id, 
+      itemName: item.name, 
+      expanded: !expanded 
+    });
   };
 
   // Generate a story based on the dish name
@@ -72,34 +101,35 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
   };
 
   return (
-    <div className="rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm mb-4 transform transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg border border-white/5">
+    <div className="rounded-lg overflow-hidden bg-white/5 backdrop-blur-sm mb-4 transform transition-all duration-300 hover:translate-y-[-2px] hover:shadow-lg border border-white/10 luxury-card">
       <Link 
         to={`/item/${item.id}`}
         className="block text-current no-underline"
+        onClick={() => trackUserInteraction('view_item_detail', { itemId: item.id, itemName: item.name })}
       >
         <div className="relative">
           {/* Main image - larger and more prominent */}
           {item.image ? (
             <div className="w-full h-44 overflow-hidden">
               <img 
-                src={item.image || "/lovable-uploads/973e961b-2c3d-4553-ac5c-ba9a8b3182f8.png"} 
+                src={item.image || "/lovable-uploads/a5a4817c-9d32-48ff-92bd-f0dd430cc999.png"} 
                 alt={item.name}
                 className={`w-full h-full object-cover transition-all duration-500 ${
                   imageLoaded ? "opacity-100" : "opacity-0"
                 }`}
                 onLoad={() => setImageLoaded(true)}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
             </div>
           ) : (
-            <div className="w-full h-44 bg-gradient-to-b from-[#CA3F3F]/70 to-black/70 flex items-center justify-center">
+            <div className="w-full h-44 bg-gradient-to-b from-[#CA3F3F]/60 to-black/80 flex items-center justify-center">
               <span className="text-3xl font-bold text-white/80">{item.name.charAt(0)}</span>
             </div>
           )}
           
           {/* Item details overlay on image */}
           <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-            <h4 className="font-bold text-xl mb-1 drop-shadow-md">{item.name}</h4>
+            <h4 className="font-bold text-xl mb-1 drop-shadow-md tracking-wide">{item.name}</h4>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {item.popular && <span className="badge-popular">Popular</span>}
               {item.spicy && <span className="badge-spicy">Spicy</span>}
@@ -117,7 +147,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
         {/* Description section */}
         <div className="p-4 border-t border-white/10">
           {item.description && (
-            <p className="text-sm text-gray-300">{item.description}</p>
+            <p className="text-sm text-gray-300 leading-relaxed">{item.description}</p>
           )}
         </div>
       </Link>
@@ -126,16 +156,16 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
       <div className="flex justify-between items-center p-4 bg-white/5 border-t border-white/10">
         <button
           onClick={toggleDetails}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-colors transform hover:scale-105"
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors transform hover:scale-105 shadow-md"
           aria-label={expanded ? "Hide details" : "Show details"}
         >
           {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </button>
         
-        <div className="flex items-center bg-black/30 rounded-lg p-1">
+        <div className="flex items-center bg-black/30 rounded-lg p-1 shadow-inner">
           <button
             onClick={decrementQuantity}
-            className="w-10 h-10 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105"
+            className="w-10 h-10 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
             aria-label="Decrease quantity"
           >
             <Minus size={18} />
@@ -145,7 +175,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
           
           <button
             onClick={incrementQuantity}
-            className="w-10 h-10 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105"
+            className="w-10 h-10 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
             aria-label="Increase quantity"
           >
             <Plus size={18} />
@@ -155,9 +185,9 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
       
       {/* Expanded details section */}
       {expanded && (
-        <div className="bg-black/30 p-4 animate-fade-in border-t border-white/10">
+        <div className="bg-black/40 backdrop-blur-sm p-4 animate-fade-in border-t border-white/10">
           {/* Origin Story */}
-          <div className="mb-4 p-4 bg-[#CA3F3F]/20 rounded-lg">
+          <div className="mb-4 p-4 bg-[#CA3F3F]/20 rounded-lg border border-[#CA3F3F]/10">
             <h5 className="text-base font-medium text-white mb-2 flex items-center">
               <Info size={16} className="mr-2" /> Dish Story
             </h5>
@@ -165,7 +195,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
           </div>
           
           <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-white/5 p-4 rounded-lg">
+            <div className="bg-white/5 p-4 rounded-lg border border-white/10">
               <h5 className="text-base font-medium text-white mb-3 border-b border-white/10 pb-2">Nutrition</h5>
               <ul className="space-y-2">
                 {item.protein && (
@@ -191,7 +221,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
               </ul>
             </div>
             
-            <div className="bg-white/5 p-4 rounded-lg">
+            <div className="bg-white/5 p-4 rounded-lg border border-white/10">
               <h5 className="text-base font-medium text-white mb-3 border-b border-white/10 pb-2">Allergens</h5>
               {item.allergens && item.allergens.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
@@ -212,7 +242,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
           </div>
           
           {item.sourcing && (
-            <div className="mb-4 bg-white/5 p-4 rounded-lg">
+            <div className="mb-4 bg-white/5 p-4 rounded-lg border border-white/10">
               <h5 className="text-base font-medium text-white mb-2 border-b border-white/10 pb-2">Sourcing</h5>
               <p className="text-sm text-gray-300 leading-relaxed">{item.sourcing}</p>
             </div>

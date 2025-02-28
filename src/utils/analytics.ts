@@ -1,4 +1,6 @@
 
+import * as fs from 'fs';
+
 // Unique identifier for the current user session
 let userId: string;
 
@@ -29,6 +31,9 @@ const generateUUID = (): string => {
   });
 };
 
+// Directory for storing analytics data files
+const ANALYTICS_DIR = './analytics_data';
+
 // Track user interactions
 export const trackUserInteraction = (
   action: string, 
@@ -57,6 +62,45 @@ export const trackUserInteraction = (
   
   // Send data to backend API
   sendAnalyticsData(eventData);
+  
+  // Save data to local file system (would be done server-side in a real app)
+  try {
+    saveAnalyticsToFile(eventData);
+  } catch (error) {
+    console.error('Failed to save analytics to file:', error);
+  }
+};
+
+// Save analytics data to CSV file
+const saveAnalyticsToFile = (data: Record<string, any>): void => {
+  // In a real application, this would be done on the server side
+  // This is a simulation of how it would work
+  
+  // Create user-specific file
+  const userDirPath = `${ANALYTICS_DIR}/${data.userId}`;
+  const filePath = `${userDirPath}/interactions.csv`;
+  
+  // This would create the directory if it doesn't exist
+  // fs.mkdirSync(userDirPath, { recursive: true });
+  
+  // Format data for CSV
+  const csvLine = `${data.timestamp},${data.action},${JSON.stringify(data)}\n`;
+  
+  // Append to CSV file
+  // fs.appendFileSync(filePath, csvLine);
+  
+  // Save chat queries separately if this is a search action
+  if (data.action === 'search' && data.query) {
+    const chatFilePath = `${userDirPath}/chat_queries.txt`;
+    const chatLine = `${data.timestamp}: ${data.query}\n`;
+    // fs.appendFileSync(chatFilePath, chatLine);
+  }
+  
+  // Store the analytics data in localStorage for demo purposes
+  // In a real app, this would be sent to a server
+  const analyticsData = JSON.parse(localStorage.getItem('thai_cookery_analytics') || '[]');
+  analyticsData.push(data);
+  localStorage.setItem('thai_cookery_analytics', JSON.stringify(analyticsData));
 };
 
 // Get or create a unique session ID
@@ -131,6 +175,41 @@ const sendAnalyticsData = async (data: Record<string, any>): Promise<void> => {
   }
 };
 
+// Get analytics data (for demonstration purposes)
+export const getAnalyticsData = (): any[] => {
+  return JSON.parse(localStorage.getItem('thai_cookery_analytics') || '[]');
+};
+
+// Export analytics data to CSV
+export const exportAnalyticsToCSV = (): string => {
+  const analyticsData = getAnalyticsData();
+  
+  if (analyticsData.length === 0) {
+    return '';
+  }
+  
+  // Get all possible headers from the data
+  const allKeys = new Set<string>();
+  analyticsData.forEach(data => {
+    Object.keys(data).forEach(key => allKeys.add(key));
+  });
+  
+  const headers = Array.from(allKeys);
+  
+  // Create CSV content
+  let csvContent = headers.join(',') + '\n';
+  
+  analyticsData.forEach(data => {
+    const row = headers.map(header => {
+      const value = data[header] || '';
+      return typeof value === 'object' ? JSON.stringify(value).replace(/,/g, ';') : value;
+    });
+    csvContent += row.join(',') + '\n';
+  });
+  
+  return csvContent;
+};
+
 // Automatically track when the user leaves the page
 window.addEventListener('beforeunload', () => {
   trackUserInteraction('page_exit', {
@@ -141,5 +220,7 @@ window.addEventListener('beforeunload', () => {
 // Export functions for direct use
 export default {
   trackUserInteraction,
-  getUserId
+  getUserId,
+  getAnalyticsData,
+  exportAnalyticsToCSV
 };

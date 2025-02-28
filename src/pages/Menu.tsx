@@ -3,15 +3,18 @@ import React, { useState, useEffect, useRef } from "react";
 import Layout from "@/components/Layout";
 import MenuCategory from "@/components/MenuCategory";
 import SearchBar from "@/components/SearchBar";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
 import { menuCategories } from "@/data/menuData";
 import MenuItem from "@/components/MenuItem";
 import { trackUserInteraction } from "@/utils/analytics";
+import { useCart } from "@/context/CartContext";
 
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState("starters");
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchResults, setSearchResults] = useState<any>(null);
+  const [showCartTooltip, setShowCartTooltip] = useState(false);
+  const { itemCount } = useCart();
   const categoryScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,10 +66,47 @@ const Menu = () => {
   const selectedCategory = menuCategories.find(cat => cat.id === activeCategory) || menuCategories[0];
 
   return (
-    <Layout title="" showHeader={true}>
-      <div className={`space-y-6 ${isLoaded ? "animate-fade-in" : "opacity-0"}`} style={{ backgroundColor: "#000000", color: "#FFFFFF", minHeight: "100vh" }}>
-        {/* Logo in the middle */}
-        <div className="flex justify-center py-4 animate-fade-in">
+    <Layout title="" showHeader={false}>
+      <div className={`space-y-4 ${isLoaded ? "animate-fade-in" : "opacity-0"}`} style={{ backgroundColor: "#000000", color: "#FFFFFF", minHeight: "100vh" }}>
+        {/* Header with cart button */}
+        <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-md py-3 px-4 flex justify-between items-center shadow-lg">
+          <div className="w-10"></div> {/* Empty div for centering */}
+          
+          <div className="flex items-center">
+            <img 
+              src="/lovable-uploads/7961a339-d4e8-4220-8eda-b2b4ed4dff2c.png" 
+              alt="Thai Cookery Logo" 
+              className="h-9 w-9"
+            />
+          </div>
+          
+          <div className="relative">
+            <button 
+              onClick={() => window.location.href = '/cart'}
+              className="p-2 rounded-full hover:bg-gray-800 transition-colors relative"
+              aria-label="Shopping cart"
+              onMouseEnter={() => setShowCartTooltip(true)}
+              onMouseLeave={() => setShowCartTooltip(false)}
+            >
+              <div className={`absolute inset-0 rounded-full ${showCartTooltip ? 'border-2 border-[#CA3F3F] animate-pulse' : 'border-0'}`}></div>
+              <ShoppingBag size={22} className="text-white" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#CA3F3F] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-fade-in">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+            
+            {showCartTooltip && (
+              <div className="absolute -bottom-8 right-0 bg-[#CA3F3F] text-white text-xs py-1 px-2 rounded whitespace-nowrap animate-fade-in">
+                Your Cart
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Logo */}
+        <div className="flex justify-center pt-3 animate-fade-in">
           <a 
             href="/" 
             onClick={(e) => {
@@ -78,14 +118,14 @@ const Menu = () => {
             className="cursor-pointer transition-transform hover:scale-105"
           >
             <img 
-              src="/lovable-uploads/200a4b3d-1a93-4c57-bd31-4fde23ab825d.png" 
+              src="/lovable-uploads/7961a339-d4e8-4220-8eda-b2b4ed4dff2c.png" 
               alt="Thai Cookery Logo" 
-              className="h-24 w-24 rounded-full shadow-lg animate-pulse-subtle"
+              className="h-20 w-20 rounded-full shadow-lg animate-pulse-subtle"
             />
           </a>
         </div>
         
-        <h1 className="text-2xl font-bold text-center text-white animate-fade-in" style={{ animationDelay: "100ms" }}>Thai Cookery</h1>
+        <h1 className="text-2xl font-bold text-center text-white animate-fade-in tracking-wider" style={{ animationDelay: "100ms" }}>Thai Cookery</h1>
         
         {/* Search Bar */}
         <div className="px-4 mb-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
@@ -95,7 +135,7 @@ const Menu = () => {
         {/* Display Search Results or Normal Categories */}
         {searchResults ? (
           <div className="px-4 space-y-4 animate-fade-in">
-            <div className="bg-[#CA3F3F] py-4 px-4 rounded-t-xl">
+            <div className="bg-[#CA3F3F] py-4 px-4 rounded-t-xl shadow-md backdrop-blur-sm">
               <h2 className="text-xl font-bold text-white">{searchResults.title || "Search Results"}</h2>
             </div>
             <div className="space-y-4">
@@ -114,7 +154,7 @@ const Menu = () => {
               
               <button 
                 onClick={clearSearchResults}
-                className="w-full text-[#CA3F3F] bg-white/10 py-3 rounded-lg font-medium hover:bg-white/15 transition-colors border border-[#CA3F3F]/20"
+                className="w-full text-white bg-[#CA3F3F] py-3 rounded-lg font-medium hover:opacity-90 transition-colors shadow-md my-2 transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 Back to Menu
               </button>
@@ -126,7 +166,7 @@ const Menu = () => {
             <div className="relative px-2 animate-fade-in" style={{ animationDelay: "300ms" }}>
               <button 
                 onClick={() => scrollCategories('left')} 
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/70 rounded-full p-1.5 shadow-lg hover:bg-black/90 transition-all"
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/80 rounded-full p-1.5 shadow-lg hover:bg-black/90 transition-all"
                 aria-label="Scroll left"
               >
                 <ChevronLeft size={24} className="text-white" />
@@ -134,13 +174,13 @@ const Menu = () => {
               
               <div 
                 ref={categoryScrollRef}
-                className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory scroll-smooth"
+                className="flex overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory scroll-smooth px-2"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
                 {menuCategories.map((category, index) => (
                   <div 
                     key={category.id}
-                    className={`flex-shrink-0 w-28 mx-2 snap-center cursor-pointer transition-all duration-300 ${
+                    className={`flex-shrink-0 w-28 mx-1.5 snap-center cursor-pointer transition-all duration-300 ${
                       activeCategory === category.id ? "scale-105" : "opacity-70 hover:opacity-100"
                     }`}
                     onClick={() => handleCategoryChange(category.id)}
@@ -148,7 +188,7 @@ const Menu = () => {
                   >
                     <div className={`aspect-square rounded-lg overflow-hidden mb-2 border-2 shadow-md transform transition-all duration-300 ${
                       activeCategory === category.id 
-                        ? "border-white scale-105" 
+                        ? "border-[#CA3F3F] shadow-[0_0_10px_rgba(202,63,63,0.3)]" 
                         : "border-transparent hover:border-white/50"
                     }`}>
                       <div className="w-full h-full flex items-center justify-center bg-[#CA3F3F] text-white overflow-hidden">
@@ -172,7 +212,7 @@ const Menu = () => {
               
               <button 
                 onClick={() => scrollCategories('right')} 
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/70 rounded-full p-1.5 shadow-lg hover:bg-black/90 transition-all"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-black/80 rounded-full p-1.5 shadow-lg hover:bg-black/90 transition-all"
                 aria-label="Scroll right"
               >
                 <ChevronRight size={24} className="text-white" />
@@ -180,8 +220,8 @@ const Menu = () => {
             </div>
 
             {/* Active Category Header */}
-            <div className="bg-[#CA3F3F] py-4 px-4 rounded-t-xl shadow-md animate-fade-in" style={{ animationDelay: "400ms" }}>
-              <h2 className="text-xl font-bold text-white">{selectedCategory.name}</h2>
+            <div className="bg-[#CA3F3F] py-4 px-4 rounded-t-xl shadow-lg backdrop-blur-sm animate-fade-in" style={{ animationDelay: "400ms" }}>
+              <h2 className="text-xl font-bold text-white tracking-wide">{selectedCategory.name}</h2>
               {selectedCategory.description && (
                 <p className="text-white/90 text-sm">{selectedCategory.description}</p>
               )}

@@ -2,6 +2,7 @@
 import React from 'react';
 import { useCart } from '@/context/CartContext';
 import { Link } from 'react-router-dom';
+import { trackUserInteraction } from '@/utils/analytics';
 
 interface CartSummaryProps {
   checkoutButton?: boolean;
@@ -20,38 +21,41 @@ const CartSummary: React.FC<CartSummaryProps> = ({ checkoutButton = true }) => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-      <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
+    <div className="bg-white/5 backdrop-blur-sm rounded-xl shadow-md p-4 border border-white/10 transition-all hover:border-white/20">
+      <h3 className="font-semibold text-white mb-4 border-b border-white/10 pb-2">Order Summary</h3>
       
-      <div className="space-y-2 mb-4">
+      <div className="space-y-3 mb-4">
         <div className="flex justify-between">
-          <span className="text-gray-600">Subtotal</span>
-          <span className="text-gray-800">${subtotal.toFixed(2)}</span>
+          <span className="text-gray-300">Subtotal</span>
+          <span className="text-white font-medium">${subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Tax</span>
-          <span className="text-gray-800">${tax.toFixed(2)}</span>
+          <span className="text-gray-300">Tax</span>
+          <span className="text-white font-medium">${tax.toFixed(2)}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600">Delivery</span>
-          <span className="text-gray-800">Free</span>
+          <span className="text-gray-300">Delivery</span>
+          <span className="text-white font-medium">Free</span>
         </div>
       </div>
       
-      <div className="border-t border-gray-100 pt-3 mb-4">
+      <div className="border-t border-white/10 pt-3 mb-4">
         <div className="flex justify-between font-medium">
-          <span className="text-gray-900">Total</span>
-          <span className="text-gray-900">${total.toFixed(2)}</span>
+          <span className="text-white">Total</span>
+          <span className="text-white text-lg">${total.toFixed(2)}</span>
         </div>
       </div>
       
       {checkoutButton && (
-        <Link 
-          to="/checkout" 
-          className="w-full block text-center bg-primary text-white font-medium py-3 rounded-lg hover:opacity-90 transition-colors"
+        <button
+          onClick={() => {
+            trackUserInteraction('checkout', { cartTotal: total.toFixed(2) });
+            window.location.href = '/checkout';
+          }}
+          className="w-full bg-[#CA3F3F] text-white font-medium py-3 rounded-lg hover:opacity-90 transition-transform transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
         >
           Proceed to Checkout
-        </Link>
+        </button>
       )}
     </div>
   );
