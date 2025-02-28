@@ -4,15 +4,31 @@ import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, Clock } from "lucide-react";
 import { trackUserInteraction } from "@/utils/analytics";
 import { toast } from "sonner";
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { subtotal, clearCart } = useCart();
+  const { cart, subtotal, clearCart } = useCart();
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  
+  // Calculate estimated preparation time based on items
+  const estimatedPrepTime = cart.reduce((total, item) => {
+    return total + (item.quantity * 5); // Each item adds 5 minutes
+  }, 0);
+  
+  // Format the estimated time
+  const formatEstimatedTime = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      return `${hours} hour${hours !== 1 ? 's' : ''} ${remainingMinutes > 0 ? `and ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}` : ''}`;
+    }
+  };
 
   useEffect(() => {
     // Track page view
@@ -28,14 +44,13 @@ const Checkout = () => {
 
   const handleCheckout = () => {
     setIsProcessing(true);
-    trackUserInteraction('checkout_complete', { subtotal: subtotal.toFixed(2) });
+    trackUserInteraction('checkout_complete', { 
+      subtotal: subtotal.toFixed(2),
+      estimatedPrepTime: estimatedPrepTime
+    });
     
-    // Set the 5-minute countdown timer
-    const startTime = Date.now();
-    const endTime = startTime + (5 * 60 * 1000); // 5 minutes in milliseconds
-    
-    localStorage.setItem('orderStartTime', startTime.toString());
-    localStorage.setItem('orderEndTime', endTime.toString());
+    // Store the estimated prep time for thank-you page
+    localStorage.setItem('estimatedPrepTime', estimatedPrepTime.toString());
     
     // Simulate payment processing
     setTimeout(() => {
@@ -45,7 +60,9 @@ const Checkout = () => {
       toast.success(
         <div className="flex flex-col">
           <span className="font-medium">Order Confirmed!</span>
-          <span className="text-sm text-gray-500">Your food will be ready in approximately 5 minutes</span>
+          <span className="text-sm text-gray-500">
+            Estimated time: {formatEstimatedTime(estimatedPrepTime)}
+          </span>
         </div>,
         { duration: 4000 }
       );
@@ -92,6 +109,27 @@ const Checkout = () => {
                   <span className="text-xl text-[#CA3F3F]">${totalAmount.toFixed(2)}</span>
                 </div>
               </div>
+            </div>
+
+            {/* Estimated Time Card */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 shadow-lg">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-[#CA3F3F]/20 p-2 rounded-full">
+                  <Clock size={20} className="text-[#CA3F3F]" />
+                </div>
+                <h2 className="text-lg font-medium text-white">Estimated Preparation Time</h2>
+              </div>
+              
+              <div className="flex items-center mb-2">
+                <span className="text-2xl font-bold text-white">
+                  {formatEstimatedTime(estimatedPrepTime)}
+                </span>
+              </div>
+              
+              <p className="text-gray-400 text-sm">
+                Each item in your order adds approximately 5 minutes to the preparation time.
+                Your order has {cart.reduce((total, item) => total + item.quantity, 0)} item(s).
+              </p>
             </div>
 
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 shadow-lg">
