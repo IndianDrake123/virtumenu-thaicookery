@@ -1,47 +1,23 @@
+import React from 'react';
+import { NavigationBar } from './NavigationBar';
+import { CRMNavigation } from './CRMNavigation';
+import { useCRM } from '@/context/CRMContext';
 
-import React, { ReactNode, useState, useEffect } from "react";
-import Header from "./Header";
-import SearchBar from "./SearchBar";
-
-interface LayoutProps {
-  children: ReactNode;
-  showHeader?: boolean;
-  title?: string;
-  showBackButton?: boolean;
-  showSearch?: boolean;
-}
-
-const Layout: React.FC<LayoutProps> = ({
-  children,
-  showHeader = true,
-  title,
-  showBackButton = true,
-  showSearch = true,
-}) => {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    // Simulate a slight loading delay for the animation to be visible
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
-
+export const Layout = ({ children }: { children: React.ReactNode }) => {
+  const { currentCustomer } = useCRM();
+  
   return (
-    <div className="min-h-screen flex flex-col bg-black">
-      {showHeader && <Header title={title} showBackButton={showBackButton} />}
-      
-      <main 
-        className={`flex-1 pt-2 transition-opacity duration-500 ease-in-out ${
-          isLoaded ? "opacity-100" : "opacity-0"
-        }`}
-      >
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {currentCustomer ? <CRMNavigation /> : <NavigationBar />}
+      <main className="flex-1">
         {children}
       </main>
+      <footer className="bg-gray-100 border-t py-6">
+        <div className="container mx-auto px-4 text-center text-gray-600 text-sm">
+          <p>© {new Date().getFullYear()} Thai Cookery. All rights reserved.</p>
+          <p className="mt-1">Made with ❤️ for delicious food.</p>
+        </div>
+      </footer>
     </div>
   );
 };
-
-export default Layout;

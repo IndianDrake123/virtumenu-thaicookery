@@ -1,5 +1,5 @@
-
 import * as fs from 'fs';
+import { Customer } from '../context/CRMContext';
 
 // Unique identifier for the current user session
 let userId: string;
@@ -217,10 +217,100 @@ window.addEventListener('beforeunload', () => {
   });
 });
 
+// Track user interactions with customer info
+export const trackCustomerInteraction = (
+  customerId: string,
+  action: string, 
+  data: Record<string, any>
+): void => {
+  const userId = getUserId();
+  const timestamp = new Date().toISOString();
+  const sessionId = getSessionId();
+  const menuId = getMenuId();
+  
+  const eventData = {
+    userId,
+    customerId,
+    menuId,
+    sessionId,
+    action,
+    timestamp,
+    ...data,
+    userAgent: navigator.userAgent,
+    language: navigator.language,
+    referrer: document.referrer,
+    screenSize: `${window.innerWidth}x${window.innerHeight}`
+  };
+  
+  // Log to console during development
+  console.log('Customer interaction:', eventData);
+  
+  // Send data to backend API
+  sendAnalyticsData(eventData);
+  
+  // Save data to local storage (would be done server-side in a real app)
+  try {
+    saveCustomerAnalyticsToFile(eventData);
+  } catch (error) {
+    console.error('Failed to save customer analytics:', error);
+  }
+};
+
+// Save customer analytics data
+const saveCustomerAnalyticsToFile = (data: Record<string, any>): void => {
+  // Store the analytics data in localStorage for demo purposes
+  // In a real app, this would be sent to a server
+  const customerAnalyticsData = JSON.parse(localStorage.getItem('thai_cookery_customer_analytics') || '[]');
+  customerAnalyticsData.push(data);
+  localStorage.setItem('thai_cookery_customer_analytics', JSON.stringify(customerAnalyticsData));
+};
+
+// Get customer analytics data (for demonstration purposes)
+export const getCustomerAnalyticsData = (customerId?: string): any[] => {
+  const data = JSON.parse(localStorage.getItem('thai_cookery_customer_analytics') || '[]');
+  if (customerId) {
+    return data.filter((item: any) => item.customerId === customerId);
+  }
+  return data;
+};
+
+// Export customer analytics data to CSV
+export const exportCustomerAnalyticsToCSV = (customerId?: string): string => {
+  const analyticsData = getCustomerAnalyticsData(customerId);
+  
+  if (analyticsData.length === 0) {
+    return '';
+  }
+  
+  // Get all possible headers from the data
+  const allKeys = new Set<string>();
+  analyticsData.forEach(data => {
+    Object.keys(data).forEach(key => allKeys.add(key));
+  });
+  
+  const headers = Array.from(allKeys);
+  
+  // Create CSV content
+  let csvContent = headers.join(',') + '\n';
+  
+  analyticsData.forEach(data => {
+    const row = headers.map(header => {
+      const value = data[header] || '';
+      return typeof value === 'object' ? JSON.stringify(value).replace(/,/g, ';') : value;
+    });
+    csvContent += row.join(',') + '\n';
+  });
+  
+  return csvContent;
+};
+
 // Export functions for direct use
 export default {
   trackUserInteraction,
+  trackCustomerInteraction,
   getUserId,
   getAnalyticsData,
-  exportAnalyticsToCSV
+  exportAnalyticsToCSV,
+  getCustomerAnalyticsData,
+  exportCustomerAnalyticsToCSV
 };
