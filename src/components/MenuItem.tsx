@@ -170,67 +170,25 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
           </button>
           
           <div className="flex items-center gap-2">
-            <div className="flex items-center bg-black/30 rounded-lg">
-              <button
-                onClick={decrementQuantity}
-                className="w-6 h-6 rounded-l-lg bg-transparent text-white flex items-center justify-center hover:bg-black/40 transition-all"
-                aria-label="Decrease quantity"
-              >
-                <Minus size={12} />
-              </button>
-              
-              <span className="mx-1 font-medium text-white w-4 text-center text-xs">{quantity}</span>
-              
-              <button
-                onClick={incrementQuantity}
-                className="w-6 h-6 rounded-r-lg bg-transparent text-white flex items-center justify-center hover:bg-black/40 transition-all"
-                aria-label="Increase quantity"
-              >
-                <Plus size={12} />
-              </button>
-            </div>
-            
             <button
               onClick={handleAddToCart}
               className="flex items-center justify-center px-3 py-1.5 rounded-lg bg-[#CA3F3F]/90 text-white text-sm font-medium hover:bg-[#CA3F3F] transition-all"
               aria-label="Add to cart"
             >
               <ShoppingBag size={14} className="mr-1" />
-              <span>${(item.price * quantity).toFixed(2)}</span>
+              <span>Add to Cart</span>
             </button>
           </div>
         </div>
       ) : (
         <div className="px-4 py-3 bg-white/5 border-t border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleDetails}
-              className="flex items-center justify-center w-7 h-7 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors"
-              aria-label="Show details"
-            >
-              <ChevronDown size={14} />
-            </button>
-            
-            <div className="flex items-center">
-              <button
-                onClick={decrementQuantity}
-                className="w-6 h-6 rounded-l-md bg-[#CA3F3F]/80 text-white flex items-center justify-center hover:bg-[#CA3F3F] transition-all"
-                aria-label="Decrease quantity"
-              >
-                <Minus size={12} />
-              </button>
-              
-              <span className="w-5 font-medium text-white text-center text-sm">{quantity}</span>
-              
-              <button
-                onClick={incrementQuantity}
-                className="w-6 h-6 rounded-r-md bg-[#CA3F3F]/80 text-white flex items-center justify-center hover:bg-[#CA3F3F] transition-all"
-                aria-label="Increase quantity"
-              >
-                <Plus size={12} />
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={toggleDetails}
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors"
+            aria-label="Show details"
+          >
+            <ChevronDown size={14} />
+          </button>
           
           <button
             onClick={handleAddToCart}
@@ -238,7 +196,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
             aria-label="Add to cart"
           >
             <ShoppingBag size={14} className="mr-1" />
-            Add to Cart · ${(item.price * quantity).toFixed(2)}
+            Add to Cart
           </button>
         </div>
       )}
@@ -314,7 +272,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
               className="w-full py-4 rounded-lg bg-[#CA3F3F] text-white font-medium hover:opacity-90 transition-all flex items-center justify-center transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
             >
               <ShoppingBag size={18} className="mr-2" />
-              Add {quantity} to cart · ${(item.price * quantity).toFixed(2)}
+              Add to Cart
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, AlertTriangle, Award, Zap, Clock, UserCheck, MessageCircle } from 'lucide-react';
+import { X, AlertTriangle, Award, Zap, Clock, UserCheck, MessageCircle, Search } from 'lucide-react';
 import { menuCategories } from '@/data/menuData';
 import { trackUserInteraction } from '@/utils/analytics';
 
@@ -31,6 +31,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationDirection, setAnimationDirection] = useState<'left' | 'right'>('left');
   const [placeholderVisible, setPlaceholderVisible] = useState(true);
+  const [isFocused, setIsFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
@@ -84,6 +85,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsExpanded(false);
+        setIsFocused(false);
       }
     };
 
@@ -272,11 +274,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
+  const handleFocus = () => {
+    setIsExpanded(true);
+    setIsFocused(true);
+  };
+
   return (
     <div ref={searchRef} className="relative animate-fade-in">
-      <div className="relative flex items-center">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <MessageCircle size={20} className="text-[#CA3F3F] animate-pulse-subtle" />
+      <div className={`relative flex items-center transition-all duration-300 ${isFocused ? 'transform scale-[1.02]' : ''}`}>
+        <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-all duration-300 ${isFocused ? 'text-[#CA3F3F]' : 'text-gray-400'}`}>
+          <Search size={20} className="transition-all duration-300" />
         </div>
         
         <input
@@ -284,14 +291,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
           type="text"
           value={query || displayQuery}
           onChange={handleInputChange}
-          onFocus={() => setIsExpanded(true)}
+          onFocus={handleFocus}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           placeholder={
             isSearchActive && currentSearchQuery
               ? currentSearchQuery
               : faqs[placeholderIndex]?.text
           }
-          className="block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all duration-500 shadow-lg hover:shadow-xl"
+          className={`block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all duration-500 shadow-lg hover:shadow-xl ${
+            isFocused ? 'bg-black/80 border-[#CA3F3F]/50 shadow-[0_0_15px_rgba(202,63,63,0.15)]' : 'hover:bg-gray-800/70'
+          }`}
         />
         
         {/* Animated placeholder text that transitions between suggestions */}
