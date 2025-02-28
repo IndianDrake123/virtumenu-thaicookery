@@ -126,10 +126,9 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
       <div className="flex justify-between items-center p-4 bg-white/5 border-t border-white/10">
         <button
           onClick={toggleDetails}
-          className="flex items-center justify-center px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition-colors transform hover:scale-105"
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-colors transform hover:scale-105"
           aria-label={expanded ? "Hide details" : "Show details"}
         >
-          <span className="mr-2 text-sm font-medium">Details</span>
           {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </button>
         

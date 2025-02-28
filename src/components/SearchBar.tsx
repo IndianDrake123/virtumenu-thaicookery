@@ -1,7 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, AlertTriangle, Award, Zap, Clock, UserCheck } from 'lucide-react';
+import { Search, X, AlertTriangle, Award, Zap, Clock, UserCheck, MessageSquare } from 'lucide-react';
 import { menuCategories } from '@/data/menuData';
+import { trackUserInteraction } from '@/utils/analytics';
 
 interface SearchBarProps {
   onSearchResults: (results: any) => void;
@@ -18,7 +19,6 @@ interface SearchSuggestion {
 const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
   const [query, setQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-  const [conversation, setConversation] = useState<{sender: 'user' | 'system', text: string}[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -48,8 +48,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
   const handleSearch = (searchText: string = query) => {
     if (!searchText.trim()) return;
 
-    // Add user message to conversation
-    setConversation(prev => [...prev, { sender: 'user', text: searchText }]);
+    // Track search interaction
+    trackUserInteraction('search', { query: searchText });
     
     // Process search text
     const searchLower = searchText.toLowerCase();
@@ -75,12 +75,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
       results = textSearch(searchLower);
     }
 
-    // Add system response to conversation
-    setConversation(prev => [...prev, { 
-      sender: 'system', 
-      text: `Here are the results for "${searchText}"` 
-    }]);
-
     // Pass results up to parent component
     onSearchResults(results);
     
@@ -90,6 +84,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
   };
 
   const handleFaqClick = (faq: SearchSuggestion) => {
+    // Track FAQ click
+    trackUserInteraction('faq_click', { faq: faq.text });
+    
     setQuery(faq.text);
     handleSearch(faq.text);
   };
@@ -187,12 +184,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
     const spanishResponse = "¡Aquí está nuestro menú en español!\n\n" + 
       Object.entries(translations).map(([eng, spa]) => `${eng} → ${spa}`).join('\n');
 
-    // Add system response to conversation
-    setConversation(prev => [...prev, { 
-      sender: 'system', 
-      text: spanishResponse
-    }]);
-
     // Return empty results to show the conversation
     return {
       title: "Spanish Menu",
@@ -215,7 +206,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
 
   const clearSearch = () => {
     setQuery('');
-    setConversation([]);
     onClear();
   };
 
@@ -223,7 +213,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
     <div ref={searchRef} className="relative animate-fade-in">
       <div className="relative flex items-center">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
+          <MessageSquare className="h-5 w-5 text-gray-400" />
         </div>
         
         <input
@@ -233,7 +223,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsExpanded(true)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder="Try asking: 'what is the most popular dish'"
+          placeholder="What is the most popular dish"
           className="block w-full pl-10 pr-12 py-3.5 bg-gray-800 border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all shadow-md"
         />
         
@@ -247,30 +237,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
         )}
       </div>
       
-      {/* Expanded Search with FAQs and Conversation */}
+      {/* Expanded Search with FAQs */}
       {isExpanded && (
         <div className="absolute top-full left-0 right-0 mt-2 py-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-40 max-h-96 overflow-y-auto animate-fade-in">
-          {/* Conversation history */}
-          {conversation.length > 0 && (
-            <div className="px-4 py-2 border-b border-gray-700">
-              <h3 className="text-sm font-medium text-gray-400 mb-2">Recent conversation</h3>
-              <div className="space-y-2">
-                {conversation.map((msg, index) => (
-                  <div 
-                    key={index} 
-                    className={`p-2 rounded text-sm ${
-                      msg.sender === 'user' 
-                        ? 'bg-gray-700 text-white' 
-                        : 'bg-[#CA3F3F]/80 text-white'
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
           {/* FAQ suggestions */}
           <div className="px-4 py-2">
             <h3 className="text-sm font-medium text-gray-400 mb-2">Suggested searches</h3>

@@ -6,6 +6,7 @@ import SearchBar from "@/components/SearchBar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { menuCategories } from "@/data/menuData";
 import MenuItem from "@/components/MenuItem";
+import { trackUserInteraction } from "@/utils/analytics";
 
 const Menu = () => {
   const [activeCategory, setActiveCategory] = useState("starters");
@@ -17,6 +18,9 @@ const Menu = () => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 100);
+
+    // Track page view
+    trackUserInteraction('page_view', { page: 'menu' });
 
     return () => clearTimeout(timer);
   }, []);
@@ -31,11 +35,28 @@ const Menu = () => {
   // Handle search results
   const handleSearchResults = (results: any) => {
     setSearchResults(results);
+    
+    // Track search results
+    trackUserInteraction('search_results', { 
+      title: results.title,
+      count: results.items.length
+    });
   };
 
   // Clear search results
   const clearSearchResults = () => {
     setSearchResults(null);
+    
+    // Track clearing search
+    trackUserInteraction('clear_search', {});
+  };
+
+  // Handle category selection
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategory(categoryId);
+    
+    // Track category selection
+    trackUserInteraction('category_select', { category: categoryId });
   };
 
   // Get the current selected category
@@ -46,11 +67,22 @@ const Menu = () => {
       <div className={`space-y-6 ${isLoaded ? "animate-fade-in" : "opacity-0"}`} style={{ backgroundColor: "#000000", color: "#FFFFFF", minHeight: "100vh" }}>
         {/* Logo in the middle */}
         <div className="flex justify-center py-4 animate-fade-in">
-          <img 
-            src="/lovable-uploads/200a4b3d-1a93-4c57-bd31-4fde23ab825d.png" 
-            alt="Thai Cookery Logo" 
-            className="h-24 w-24 rounded-full shadow-lg animate-pulse-subtle"
-          />
+          <a 
+            href="/" 
+            onClick={(e) => {
+              e.preventDefault();
+              clearSearchResults();
+              handleCategoryChange("starters");
+              trackUserInteraction('logo_click', {});
+            }}
+            className="cursor-pointer transition-transform hover:scale-105"
+          >
+            <img 
+              src="/lovable-uploads/200a4b3d-1a93-4c57-bd31-4fde23ab825d.png" 
+              alt="Thai Cookery Logo" 
+              className="h-24 w-24 rounded-full shadow-lg animate-pulse-subtle"
+            />
+          </a>
         </div>
         
         <h1 className="text-2xl font-bold text-center text-white animate-fade-in" style={{ animationDelay: "100ms" }}>Thai Cookery</h1>
@@ -111,7 +143,7 @@ const Menu = () => {
                     className={`flex-shrink-0 w-28 mx-2 snap-center cursor-pointer transition-all duration-300 ${
                       activeCategory === category.id ? "scale-105" : "opacity-70 hover:opacity-100"
                     }`}
-                    onClick={() => setActiveCategory(category.id)}
+                    onClick={() => handleCategoryChange(category.id)}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className={`aspect-square rounded-lg overflow-hidden mb-2 border-2 shadow-md transform transition-all duration-300 ${
