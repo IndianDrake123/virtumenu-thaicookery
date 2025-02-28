@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Phone, Mail, Star, Gift } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, Phone, Mail, Star, Gift, MessageSquare, Send } from 'lucide-react';
 import { trackUserInteraction } from '@/utils/analytics';
 import { toast } from 'sonner';
 
@@ -14,6 +15,9 @@ const ThankYou = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
+  const [noteToOwner, setNoteToOwner] = useState('');
+  const [isNoteSent, setIsNoteSent] = useState(false);
+  const [showNoteForm, setShowNoteForm] = useState(false);
   
   useEffect(() => {
     // Track page view
@@ -56,6 +60,23 @@ const ThankYou = () => {
     trackUserInteraction('set_rating', { rating: index });
   };
   
+  const handleSendNote = () => {
+    if (noteToOwner.trim().length < 5) {
+      toast.error('Please enter a note with at least 5 characters');
+      return;
+    }
+    
+    // Track the note submission
+    trackUserInteraction('submit_note', { noteLength: noteToOwner.length });
+    
+    // In a real app, this would send the note to the owner
+    setIsNoteSent(true);
+    
+    toast.success('Your note has been sent to the owner. Thank you for your feedback!', {
+      duration: 4000
+    });
+  };
+  
   return (
     <div className="bg-black min-h-screen text-white">
       {/* Custom Header */}
@@ -87,7 +108,7 @@ const ThankYou = () => {
       <main className="px-4 pt-8 pb-16 max-w-md mx-auto">
         {/* Logo and Title */}
         <div className="flex flex-col items-center mb-6">
-          <div className="bg-gradient-to-r from-red-800 to-red-600 p-2 rounded-full mb-5">
+          <div className="bg-gradient-to-r from-red-800 to-red-600 p-2 rounded-full mb-5 shadow-lg">
             <img 
               src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
@@ -95,7 +116,7 @@ const ThankYou = () => {
             />
           </div>
           
-          <h1 className="text-2xl font-bold text-center mb-2">
+          <h1 className="text-2xl font-bold text-center mb-2 text-white">
             Thank You for Eating at Thai Cookery!
           </h1>
           
@@ -128,7 +149,7 @@ const ThankYou = () => {
         </div>
         
         {/* Register for Discount Section */}
-        <div className="bg-gray-900/80 rounded-lg p-6 border border-gray-800">
+        <div className="bg-gray-900/80 rounded-lg p-6 border border-gray-800 shadow-lg mb-6">
           <div className="flex items-center mb-3">
             <Gift size={20} className="text-red-500 mr-2" />
             <h2 className="text-lg font-medium">Register for a Special Discount</h2>
@@ -205,7 +226,7 @@ const ThankYou = () => {
               {/* Submit Button */}
               <Button
                 onClick={handleSubmitContact}
-                className="w-full bg-red-600 hover:bg-red-700 h-12 text-white font-medium rounded-lg"
+                className="w-full bg-red-600 hover:bg-red-700 h-12 text-white font-medium rounded-lg transition-colors"
               >
                 Register & Get 10% Off
               </Button>
@@ -231,6 +252,69 @@ const ThankYou = () => {
                   ? ` ${phoneNumber}`
                   : ` ${email}`
                 }
+              </p>
+            </div>
+          )}
+        </div>
+        
+        {/* Note to Owner Section */}
+        <div className="bg-gray-900/80 rounded-lg p-6 border border-gray-800 shadow-lg">
+          {!isNoteSent ? (
+            <>
+              <button 
+                onClick={() => setShowNoteForm(!showNoteForm)}
+                className="flex items-center w-full justify-between text-left focus:outline-none"
+              >
+                <div className="flex items-center">
+                  <MessageSquare size={20} className="text-red-500 mr-2" />
+                  <h2 className="text-lg font-medium">Leave a Note to the Owner</h2>
+                </div>
+                <svg 
+                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showNoteForm ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {showNoteForm && (
+                <div className="mt-4 animate-fade-in">
+                  <p className="text-gray-400 mb-3">
+                    Share your thoughts, feedback, or suggestions directly with the owner.
+                  </p>
+                  
+                  <Textarea
+                    value={noteToOwner}
+                    onChange={(e) => setNoteToOwner(e.target.value)}
+                    placeholder="What did you enjoy about your meal? Any suggestions for improvement?"
+                    className="w-full p-3 bg-gray-800 rounded-lg border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent min-h-[120px] mb-3"
+                  />
+                  
+                  <Button
+                    onClick={handleSendNote}
+                    className="w-full bg-red-600 hover:bg-red-700 h-12 text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+                  >
+                    <Send size={16} className="mr-2" />
+                    Send Note to Owner
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-3">
+              <div className="inline-flex items-center justify-center w-14 h-14 bg-green-500/20 rounded-full mb-3">
+                <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">
+                Thank You for Your Feedback!
+              </h3>
+              <p className="text-gray-400 text-sm">
+                We appreciate you taking the time to share your thoughts with us. 
+                Your feedback helps us improve our service.
               </p>
             </div>
           )}
