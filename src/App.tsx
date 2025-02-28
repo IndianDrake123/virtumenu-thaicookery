@@ -12,6 +12,7 @@ import ItemDetail from "./pages/ItemDetail";
 import NotFound from "./pages/NotFound";
 import Checkout from "./pages/Checkout";
 import ThankYou from "./pages/ThankYou";
+import AboutRestaurant from "./pages/AboutRestaurant";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/item/:id" element={<ItemDetail />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/thank-you" element={<ThankYou />} />
+            <Route path="/about" element={<AboutRestaurant />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>

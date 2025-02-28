@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import MenuCategory from "@/components/MenuCategory";
 import SearchBar from "@/components/SearchBar";
@@ -11,6 +11,7 @@ import { trackUserInteraction } from "@/utils/analytics";
 import { useCart } from "@/context/CartContext";
 
 const Menu = () => {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("starters");
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchResults, setSearchResults] = useState<any>(null);
@@ -73,6 +74,12 @@ const Menu = () => {
     trackUserInteraction('category_select', { category: categoryId });
   };
 
+  // Handle logo click
+  const handleLogoClick = () => {
+    navigate("/about");
+    trackUserInteraction('navigate_to_about', { from: 'menu' });
+  };
+
   // Get the current selected category
   const selectedCategory = menuCategories.find(cat => cat.id === activeCategory) || menuCategories[0];
 
@@ -83,25 +90,20 @@ const Menu = () => {
         <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-md py-3 px-4 flex justify-between items-center shadow-lg">
           <div className="w-10"></div> {/* Empty div for centering */}
           
-          <Link 
-            to="/" 
+          <button 
+            onClick={handleLogoClick}
             className="flex items-center justify-center"
-            onClick={() => {
-              clearSearchResults();
-              handleCategoryChange("starters");
-              trackUserInteraction('logo_click', {});
-            }}
           >
             <img 
               src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
               className="h-11 w-11 rounded-full shadow-md"
             />
-          </Link>
+          </button>
           
           <div className="relative">
             <button 
-              onClick={() => window.location.href = '/cart'}
+              onClick={() => navigate('/cart')}
               className="p-2 rounded-full hover:bg-gray-800 transition-colors relative"
               aria-label="Shopping cart"
               onMouseEnter={() => setShowCartTooltip(true)}
