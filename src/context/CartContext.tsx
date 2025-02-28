@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
+import { ShoppingBag, Check } from 'lucide-react';
 
 export interface CartItem {
   id: string;
@@ -93,17 +94,32 @@ export function CartProvider({ children }: CartProviderProps) {
       toast(
         <div 
           onClick={() => {
-            // Use window.location instead of navigate
             window.location.href = '/cart';
           }} 
-          className="cursor-pointer"
+          className="cursor-pointer flex items-start gap-3 p-1"
         >
-          <p className="font-medium">Added to cart</p>
-          <p className="text-sm text-gray-200">{item.quantity} × {item.name} added to your cart</p>
+          <div className="rounded-full bg-[#CA3F3F]/20 p-2 mt-0.5">
+            <ShoppingBag size={18} className="text-[#CA3F3F]" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-[15px]">Added to cart</p>
+              <div className="bg-[#CA3F3F]/20 rounded-full px-2 py-0.5 flex items-center">
+                <Check size={12} className="text-[#CA3F3F] mr-1" />
+                <span className="text-xs text-[#CA3F3F] font-medium">Success</span>
+              </div>
+            </div>
+            <p className="text-sm opacity-90 mt-0.5">
+              {item.quantity} × {item.name}
+            </p>
+            <p className="text-xs mt-1 text-[#CA3F3F] underline">
+              Click to view cart
+            </p>
+          </div>
         </div>,
         {
-          duration: 3000,
-          className: "bg-white text-black",
+          duration: 4000,
+          className: "bg-white text-black shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow",
           position: "top-center",
           closeButton: true,
         }

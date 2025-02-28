@@ -40,9 +40,12 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location, title]);
 
-  const handleBack = () => {
-    navigate(-1);
+  const handleBack = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default browser behavior
     trackUserInteraction('navigate_back', { from: location.pathname });
+    
+    // Use navigate instead of history.back() to stay within React Router
+    navigate(-1);
   };
 
   const handleCartClick = () => {
