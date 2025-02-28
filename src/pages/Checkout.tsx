@@ -29,6 +29,13 @@ const Checkout = () => {
     setIsProcessing(true);
     trackUserInteraction('checkout_complete', { subtotal: subtotal.toFixed(2) });
     
+    // Set the 5-minute countdown timer
+    const startTime = Date.now();
+    const endTime = startTime + (5 * 60 * 1000); // 5 minutes in milliseconds
+    
+    localStorage.setItem('orderStartTime', startTime.toString());
+    localStorage.setItem('orderEndTime', endTime.toString());
+    
     // Simulate payment processing
     setTimeout(() => {
       clearCart();

@@ -4,10 +4,10 @@ import { useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Check, Phone, Mail, Gift, ArrowRight, Star } from "lucide-react";
 import { trackUserInteraction } from "@/utils/analytics";
 import { toast } from "sonner";
+import OrderCountdown from "@/components/OrderCountdown";
 
 const ThankYou = () => {
   const navigate = useNavigate();
@@ -87,11 +87,15 @@ const ThankYou = () => {
             <ArrowRight size={18} className="transform rotate-180" />
             <span>Back to Menu</span>
           </button>
-          <img 
-            src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
-            alt="Thai Cookery Logo" 
-            className="h-10 w-10 rounded-full shadow-md"
-          />
+          
+          <div className="flex items-center gap-3">
+            <OrderCountdown className="animate-fade-in" />
+            <img 
+              src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
+              alt="Thai Cookery Logo" 
+              className="h-10 w-10 rounded-full shadow-md"
+            />
+          </div>
         </div>
         
         <div className="flex-1 flex flex-col items-center px-5 py-10 max-w-lg mx-auto">
@@ -137,23 +141,25 @@ const ThankYou = () => {
                   onClick={() => setIsPhoneSelected(true)}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
                     isPhoneSelected 
-                      ? 'bg-[#CA3F3F] text-white' 
+                      ? 'bg-[#CA3F3F] text-white shadow-lg' 
                       : 'bg-white/10 text-gray-300 hover:bg-white/15'
                   }`}
+                  style={{ transform: isPhoneSelected ? 'scale(1.2)' : 'scale(1)' }}
                 >
-                  <Phone size={16} />
-                  <span>Phone</span>
+                  <Phone size={isPhoneSelected ? 20 : 16} />
+                  <span className="font-medium">Phone</span>
                 </button>
                 <button
                   onClick={() => setIsPhoneSelected(false)}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all ${
                     !isPhoneSelected 
-                      ? 'bg-[#CA3F3F] text-white' 
+                      ? 'bg-[#CA3F3F] text-white shadow-lg' 
                       : 'bg-white/10 text-gray-300 hover:bg-white/15'
                   }`}
+                  style={{ transform: !isPhoneSelected ? 'scale(1.2)' : 'scale(1)' }}
                 >
-                  <Mail size={16} />
-                  <span>Email</span>
+                  <Mail size={!isPhoneSelected ? 20 : 16} />
+                  <span className="font-medium">Email</span>
                 </button>
               </div>
               
