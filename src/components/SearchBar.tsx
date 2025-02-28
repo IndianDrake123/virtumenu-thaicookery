@@ -214,7 +214,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
       <div className="relative flex items-center">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <img 
-            src="/lovable-uploads/52957af7-71a6-43d9-95bf-700564d3e1b9.png" 
+            src="/lovable-uploads/3a7ece4a-b10f-4171-93d5-65943c250b96.png" 
             alt="Chatbot" 
             className="h-5 w-5"
           />

@@ -152,33 +152,33 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
         </div>
       </Link>
       
-      {/* Action buttons */}
-      <div className="flex justify-between items-center p-4 bg-white/5 border-t border-white/10">
+      {/* Action buttons - SMALLER VERSION */}
+      <div className="flex justify-between items-center p-2 bg-white/5 border-t border-white/10">
         <button
           onClick={toggleDetails}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors transform hover:scale-105 shadow-md"
+          className="flex items-center justify-center w-8 h-8 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors transform hover:scale-105 shadow-md"
           aria-label={expanded ? "Hide details" : "Show details"}
         >
-          {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
         
         <div className="flex items-center bg-black/30 rounded-lg p-1 shadow-inner">
           <button
             onClick={decrementQuantity}
-            className="w-10 h-10 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
+            className="w-7 h-7 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
             aria-label="Decrease quantity"
           >
-            <Minus size={18} />
+            <Minus size={14} />
           </button>
           
-          <span className="mx-3 font-medium text-white w-6 text-center text-lg">{quantity}</span>
+          <span className="mx-2 font-medium text-white w-5 text-center text-base">{quantity}</span>
           
           <button
             onClick={incrementQuantity}
-            className="w-10 h-10 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
+            className="w-7 h-7 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
             aria-label="Increase quantity"
           >
-            <Plus size={18} />
+            <Plus size={14} />
           </button>
         </div>
       </div>

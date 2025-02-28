@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import CartSummary from "@/components/CartSummary";
 import { Link } from "react-router-dom";
@@ -46,9 +46,9 @@ const Cart = () => {
         <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-md py-3 px-4 flex justify-between items-center shadow-lg">
           <button 
             onClick={() => window.history.back()}
-            className="text-white flex items-center"
+            className="text-white flex items-center hover:text-[#CA3F3F] transition-colors active:text-[#CA3F3F]"
           >
-            <Trash2 size={18} className="mr-2" />
+            <ArrowLeft size={18} className="mr-2" />
             <span>Your Cart</span>
           </button>
           
@@ -58,9 +58,9 @@ const Cart = () => {
             onClick={() => trackUserInteraction('navigate', { from: 'cart', to: 'menu' })}
           >
             <img 
-              src="/lovable-uploads/7961a339-d4e8-4220-8eda-b2b4ed4dff2c.png" 
+              src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
-              className="h-9 w-9 rounded-full shadow-md"
+              className="h-10 w-10 rounded-full shadow-md"
             />
           </Link>
         </div>
@@ -96,7 +96,7 @@ const Cart = () => {
                 </p>
               </div>
               
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-white/10">
+              <div className="flex justify-between items-center mt-3 pt-2 border-t border-white/10">
                 <button 
                   onClick={() => {
                     removeFromCart(item.id);
@@ -104,10 +104,10 @@ const Cart = () => {
                   }}
                   className="text-gray-400 hover:text-[#CA3F3F] transition-colors transform hover:scale-110"
                 >
-                  <Trash2 size={18} />
+                  <Trash2 size={16} />
                 </button>
                 
-                <div className="flex items-center bg-black/30 rounded-lg p-1.5 shadow-inner">
+                <div className="flex items-center bg-black/30 rounded-lg p-1 shadow-inner">
                   <button
                     onClick={() => {
                       updateQuantity(item.id, Math.max(1, item.quantity - 1));
@@ -117,12 +117,12 @@ const Cart = () => {
                         newQuantity: Math.max(1, item.quantity - 1) 
                       });
                     }}
-                    className="w-8 h-8 flex items-center justify-center rounded-full bg-[#CA3F3F] text-white hover:opacity-90 disabled:opacity-50 shadow-md"
+                    className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CA3F3F] text-white hover:opacity-90 disabled:opacity-50 shadow-md"
                     disabled={item.quantity <= 1}
                   >
-                    <Minus size={16} />
+                    <Minus size={14} />
                   </button>
-                  <span className="mx-3 font-medium text-white">{item.quantity}</span>
+                  <span className="mx-2 font-medium text-white text-sm">{item.quantity}</span>
                   <button
                     onClick={() => {
                       updateQuantity(item.id, item.quantity + 1);
@@ -132,9 +132,9 @@ const Cart = () => {
                         newQuantity: item.quantity + 1 
                       });
                     }}
-                    className="w-8 h-8 flex items-center justify-center rounded-full bg-[#CA3F3F] text-white hover:opacity-90 shadow-md"
+                    className="w-7 h-7 flex items-center justify-center rounded-full bg-[#CA3F3F] text-white hover:opacity-90 shadow-md"
                   >
-                    <Plus size={16} />
+                    <Plus size={14} />
                   </button>
                 </div>
               </div>

@@ -72,13 +72,21 @@ const Menu = () => {
         <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-md py-3 px-4 flex justify-between items-center shadow-lg">
           <div className="w-10"></div> {/* Empty div for centering */}
           
-          <div className="flex items-center">
+          <Link 
+            to="/" 
+            className="flex items-center justify-center"
+            onClick={() => {
+              clearSearchResults();
+              handleCategoryChange("starters");
+              trackUserInteraction('logo_click', {});
+            }}
+          >
             <img 
-              src="/lovable-uploads/7961a339-d4e8-4220-8eda-b2b4ed4dff2c.png" 
+              src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
-              className="h-9 w-9"
+              className="h-11 w-11 rounded-full shadow-md animate-pulse-subtle"
             />
-          </div>
+          </Link>
           
           <div className="relative">
             <button 
@@ -105,27 +113,8 @@ const Menu = () => {
           </div>
         </div>
         
-        {/* Logo */}
-        <div className="flex justify-center pt-3 animate-fade-in">
-          <a 
-            href="/" 
-            onClick={(e) => {
-              e.preventDefault();
-              clearSearchResults();
-              handleCategoryChange("starters");
-              trackUserInteraction('logo_click', {});
-            }}
-            className="cursor-pointer transition-transform hover:scale-105"
-          >
-            <img 
-              src="/lovable-uploads/7961a339-d4e8-4220-8eda-b2b4ed4dff2c.png" 
-              alt="Thai Cookery Logo" 
-              className="h-20 w-20 rounded-full shadow-lg animate-pulse-subtle"
-            />
-          </a>
-        </div>
-        
-        <h1 className="text-2xl font-bold text-center text-white animate-fade-in tracking-wider" style={{ animationDelay: "100ms" }}>Thai Cookery</h1>
+        {/* Brand Title */}
+        <h1 className="text-2xl font-bold text-center text-white animate-fade-in tracking-wider pt-2" style={{ animationDelay: "100ms" }}>Thai Cookery</h1>
         
         {/* Search Bar */}
         <div className="px-4 mb-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
