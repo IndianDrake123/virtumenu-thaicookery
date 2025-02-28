@@ -282,8 +282,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div ref={searchRef} className="relative animate-fade-in">
       <div className={`relative flex items-center transition-all duration-300 ${isFocused ? 'transform scale-[1.02]' : ''}`}>
-        <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-all duration-300 ${isFocused ? 'text-[#CA3F3F]' : 'text-gray-400'}`}>
-          <Search size={20} className="transition-all duration-300" />
+        <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-all duration-300 ${isFocused ? 'text-[#CA3F3F]' : 'text-white'}`}>
+          <Search size={22} strokeWidth={2.5} className="transition-all duration-300" />
         </div>
         
         <input
