@@ -30,6 +30,16 @@ const Checkout = () => {
     }
   };
 
+  // Get the tip from localStorage that was set in Cart page
+  const getTipAmount = () => {
+    const storedTip = localStorage.getItem('tipAmount');
+    return storedTip ? parseFloat(storedTip) : 0;
+  };
+
+  const tipAmount = getTipAmount();
+  const taxAmount = subtotal * 0.095; // 9.5% tax
+  const totalAmount = subtotal + taxAmount + tipAmount;
+
   useEffect(() => {
     // Track page view
     trackUserInteraction('page_view', { page: 'checkout' });
@@ -71,12 +81,13 @@ const Checkout = () => {
     }, 1500);
   };
 
-  const totalAmount = subtotal + (subtotal * 0.095);
-
   return (
     <Layout title="Checkout" showHeader={true}>
       <div className="px-4 py-6 space-y-6 animate-fade-in">
-        <h1 className="text-2xl font-bold text-white mb-6">Checkout</h1>
+        {/* Center the Checkout title */}
+        <div className="flex justify-center">
+          <h1 className="text-2xl font-bold text-white mb-6">Checkout</h1>
+        </div>
         
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
@@ -95,11 +106,11 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-300">Tax (9.5%)</span>
-                  <span className="text-white">${(subtotal * 0.095).toFixed(2)}</span>
+                  <span className="text-white">${taxAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Delivery</span>
-                  <span className="text-white">Free</span>
+                  <span className="text-gray-300">Tip</span>
+                  <span className="text-white">${tipAmount.toFixed(2)}</span>
                 </div>
               </div>
               
@@ -111,13 +122,13 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* Estimated Time Card */}
+            {/* Average Preparation Time Card */}
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 shadow-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-[#CA3F3F]/20 p-2 rounded-full">
                   <Clock size={20} className="text-[#CA3F3F]" />
                 </div>
-                <h2 className="text-lg font-medium text-white">Estimated Preparation Time</h2>
+                <h2 className="text-lg font-medium text-white">Average Preparation Time</h2>
               </div>
               
               <div className="flex items-center mb-2">
