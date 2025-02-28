@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -6,7 +7,7 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 5000
 
 type ToasterToast = ToastProps & {
   id: string
@@ -142,6 +143,14 @@ type Toast = Omit<ToasterToast, "id">
 function toast({ ...props }: Toast) {
   const id = genId()
 
+  // Add custom styling class to make the toast more red
+  const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
+  
+  // Set success variant styling
+  if (props.variant === 'success') {
+    props.variant = 'default'
+  }
+
   const update = (props: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
@@ -154,6 +163,7 @@ function toast({ ...props }: Toast) {
     toast: {
       ...props,
       id,
+      className,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss()
