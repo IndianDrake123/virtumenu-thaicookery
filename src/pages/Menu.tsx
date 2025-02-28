@@ -14,6 +14,7 @@ const Menu = () => {
   const [activeCategory, setActiveCategory] = useState("starters");
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchResults, setSearchResults] = useState<any>(null);
+  const [currentQuery, setCurrentQuery] = useState('');
   const [showCartTooltip, setShowCartTooltip] = useState(false);
   const { itemCount } = useCart();
   const categoryScrollRef = useRef<HTMLDivElement>(null);
@@ -38,6 +39,14 @@ const Menu = () => {
 
   // Handle search results
   const handleSearchResults = (results: any) => {
+    // Store the current search query from the title
+    const queryMatch = results.title.match(/Search Results for "(.+?)"|(.+)/);
+    if (queryMatch) {
+      // Get the matched group that contains our query
+      const extractedQuery = queryMatch[1] || queryMatch[2] || "";
+      setCurrentQuery(extractedQuery);
+    }
+    
     setSearchResults(results);
     
     // Track search results
@@ -50,6 +59,7 @@ const Menu = () => {
   // Clear search results
   const clearSearchResults = () => {
     setSearchResults(null);
+    setCurrentQuery('');
     
     // Track clearing search
     trackUserInteraction('clear_search', {});
@@ -119,7 +129,12 @@ const Menu = () => {
         
         {/* Search Bar */}
         <div className="px-4 mb-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
-          <SearchBar onSearchResults={handleSearchResults} onClear={clearSearchResults} />
+          <SearchBar 
+            onSearchResults={handleSearchResults} 
+            onClear={clearSearchResults} 
+            currentSearchQuery={currentQuery}
+            isSearchActive={searchResults !== null}
+          />
         </div>
         
         {/* Display Search Results or Normal Categories */}

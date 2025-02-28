@@ -1,12 +1,14 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { X, AlertTriangle, Award, Zap, Clock, UserCheck } from 'lucide-react';
+import { X, AlertTriangle, Award, Zap, Clock, UserCheck, MessageCircle } from 'lucide-react';
 import { menuCategories } from '@/data/menuData';
 import { trackUserInteraction } from '@/utils/analytics';
 
 interface SearchBarProps {
   onSearchResults: (results: any) => void;
   onClear: () => void;
+  currentSearchQuery?: string;
+  isSearchActive?: boolean;
 }
 
 interface SearchSuggestion {
@@ -16,13 +18,20 @@ interface SearchSuggestion {
   icon?: React.ReactNode;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ 
+  onSearchResults, 
+  onClear, 
+  currentSearchQuery = '',
+  isSearchActive = false
+}) => {
   const [query, setQuery] = useState('');
-  const [lastQuery, setLastQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [placeholderVisible, setPlaceholderVisible] = useState(true);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
+  
   const faqs: SearchSuggestion[] = [
     { id: 'popular', text: 'What is the most popular dish?', type: 'faq', icon: <Award size={16} className="text-amber-400" /> },
     { id: 'spicy', text: 'Show me spicy dishes', type: 'faq', icon: <Zap size={16} className="text-red-500" /> },
@@ -31,6 +40,30 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
     { id: 'gluten', text: 'Show gluten-free options', type: 'faq', icon: <AlertTriangle size={16} className="text-yellow-500" /> },
     { id: 'quick', text: 'Quick lunch options', type: 'faq', icon: <Clock size={16} className="text-cyan-500" /> },
   ];
+
+  // Rotate through placeholder suggestions when not in search mode
+  useEffect(() => {
+    if (!isSearchActive && !isExpanded) {
+      const interval = setInterval(() => {
+        // Start fade out animation
+        setIsAnimating(true);
+        setPlaceholderVisible(false);
+        
+        // After fade out, change the text and fade in
+        setTimeout(() => {
+          setPlaceholderIndex(prev => (prev + 1) % faqs.length);
+          setPlaceholderVisible(true);
+          
+          // Reset animation state after completing the transition
+          setTimeout(() => {
+            setIsAnimating(false);
+          }, 300);
+        }, 300);
+      }, 5000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [isSearchActive, isExpanded, faqs.length]);
 
   // Close expanded search when clicking outside
   useEffect(() => {
@@ -51,9 +84,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
 
     // Track search interaction
     trackUserInteraction('search', { query: searchText });
-    
-    // Save the last query
-    setLastQuery(searchText);
     
     // Process search text
     const searchLower = searchText.toLowerCase();
@@ -210,7 +240,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
 
   const clearSearch = () => {
     setQuery('');
-    setLastQuery('');
     onClear();
   };
 
@@ -218,25 +247,38 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
     <div ref={searchRef} className="relative animate-fade-in">
       <div className="relative flex items-center">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <img 
-            src="/lovable-uploads/d5e5f63b-9160-4ebf-8739-d2ff0366a7f2.png" 
-            alt="AI Assistant" 
-            className="h-5 w-5"
-          />
+          <MessageCircle size={20} className="text-gray-400" />
         </div>
         
         <input
           ref={inputRef}
           type="text"
-          value={query}
+          value={isSearchActive ? currentSearchQuery : query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsExpanded(true)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder={lastQuery ? `Last search: "${lastQuery}"` : "What is the most popular dish?"}
+          placeholder={
+            isSearchActive 
+              ? '' 
+              : faqs[placeholderIndex]?.text
+          }
           className="block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all shadow-lg"
         />
         
-        {(query || lastQuery) && (
+        {/* Animated placeholder text that transitions between suggestions */}
+        {!isSearchActive && !query && (
+          <div className="absolute inset-y-0 left-0 pl-10 flex items-center pointer-events-none overflow-hidden">
+            <span 
+              className={`text-gray-400 transition-all duration-300 ease-in-out ${
+                placeholderVisible ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-4'
+              }`}
+            >
+              {faqs[placeholderIndex]?.text}
+            </span>
+          </div>
+        )}
+        
+        {(query || isSearchActive) && (
           <button 
             onClick={clearSearch}
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"

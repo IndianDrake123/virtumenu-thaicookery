@@ -218,6 +218,28 @@
   }
 }
 
+@keyframes slideOutUp {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+}
+
+@keyframes slideInUp {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* Pulse subtle animation */
 .animate-pulse-subtle {
   animation: pulsate 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -239,6 +261,15 @@
     opacity: 1;
     box-shadow: 0 0 0 0 rgba(202, 63, 63, 0);
   }
+}
+
+/* Search placeholder transition animations */
+.search-placeholder-out {
+  animation: slideOutUp 0.3s cubic-bezier(0.15, 1, 0.3, 1) forwards;
+}
+
+.search-placeholder-in {
+  animation: slideInUp 0.3s cubic-bezier(0.15, 1, 0.3, 1) forwards;
 }
 
 /* Make images load with blur effect */
