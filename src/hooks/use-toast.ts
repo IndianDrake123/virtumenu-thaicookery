@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -137,10 +138,7 @@ function dispatch(action: Action) {
   })
 }
 
-type ToastVariant = 'default' | 'destructive' | 'success'
-type Toast = Omit<ToasterToast, "id"> & {
-  variant?: ToastVariant
-}
+type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
   const id = genId()
@@ -148,13 +146,9 @@ function toast({ ...props }: Toast) {
   // Add custom styling class to make the toast more red
   const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
   
-  // Handle success variant (convert to default but keep the class styling)
-  let variant: 'default' | 'destructive' | undefined = undefined;
-  
+  // Set success variant styling
   if (props.variant === 'success') {
-    variant = 'default';
-  } else if (props.variant === 'default' || props.variant === 'destructive') {
-    variant = props.variant;
+    props.variant = 'default'
   }
 
   const update = (props: ToasterToast) =>
@@ -170,7 +164,6 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       className,
-      variant,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss()
