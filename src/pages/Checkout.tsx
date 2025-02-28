@@ -14,30 +14,37 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   
-  // Calculate estimated preparation time based on items
-  const estimatedPrepTime = cart.reduce((total, item) => {
-    return total + (item.quantity * 5); // Each item adds 5 minutes
-  }, 0);
-  
-  // Format the estimated time
-  const formatEstimatedTime = (minutes: number) => {
-    if (minutes < 60) {
-      return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
-    } else {
-      const hours = Math.floor(minutes / 60);
-      const remainingMinutes = minutes % 60;
-      return `${hours} hour${hours !== 1 ? 's' : ''} ${remainingMinutes > 0 ? `and ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}` : ''}`;
-    }
+  // Calculate estimated preparation time using the same formula as in Cart page
+  const calculatePrepTime = () => {
+    if (cart.length === 0) return 0;
+    
+    // Base prep time for any order
+    let baseTime = 15;
+    
+    // Add time based on number of items (each item adds 3 minutes)
+    const itemTime = cart.reduce((total, item) => {
+      return total + (item.quantity * 3); // 3 minutes per item on average
+    }, 0);
+    
+    // Cap at reasonable maximum time (45 minutes)
+    return Math.min(baseTime + itemTime, 45);
   };
+  
+  const estimatedPrepTime = calculatePrepTime();
 
-  // Get the tip from localStorage that was set in Cart page
+  // Get values from localStorage
   const getTipAmount = () => {
     const storedTip = localStorage.getItem('tipAmount');
     return storedTip ? parseFloat(storedTip) : 0;
   };
 
+  const getTaxAmount = () => {
+    const storedTax = localStorage.getItem('taxAmount');
+    return storedTax ? parseFloat(storedTax) : (subtotal * 0.095);
+  };
+
   const tipAmount = getTipAmount();
-  const taxAmount = subtotal * 0.095; // 9.5% tax
+  const taxAmount = getTaxAmount();
   const totalAmount = subtotal + taxAmount + tipAmount;
 
   useEffect(() => {
@@ -71,7 +78,7 @@ const Checkout = () => {
         <div className="flex flex-col">
           <span className="font-medium">Order Confirmed!</span>
           <span className="text-sm text-gray-500">
-            Estimated time: {formatEstimatedTime(estimatedPrepTime)}
+            Estimated time: {estimatedPrepTime} minutes
           </span>
         </div>,
         { duration: 4000 }
@@ -84,9 +91,9 @@ const Checkout = () => {
   return (
     <Layout title="Checkout" showHeader={true}>
       <div className="px-4 py-6 space-y-6 animate-fade-in">
-        {/* Center the Checkout title */}
-        <div className="flex justify-center">
-          <h1 className="text-2xl font-bold text-white mb-6">Checkout</h1>
+        {/* Center the main Checkout title */}
+        <div className="flex justify-center mb-6">
+          <h1 className="text-2xl font-bold text-white">Checkout</h1>
         </div>
         
         {isLoading ? (
@@ -133,12 +140,12 @@ const Checkout = () => {
               
               <div className="flex items-center mb-2">
                 <span className="text-2xl font-bold text-white">
-                  {formatEstimatedTime(estimatedPrepTime)}
+                  {estimatedPrepTime} minutes
                 </span>
               </div>
               
               <p className="text-gray-400 text-sm">
-                Each item in your order adds approximately 5 minutes to the preparation time.
+                Each item in your order adds approximately 3 minutes to the preparation time.
                 Your order has {cart.reduce((total, item) => total + item.quantity, 0)} item(s).
               </p>
             </div>
