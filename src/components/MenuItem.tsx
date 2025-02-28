@@ -158,45 +158,46 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
         </div>
       </Link>
       
-      {/* Action buttons - ENHANCED VERSION */}
-      <div className="p-3 bg-white/5 border-t border-white/10">
-        <div className="flex items-center justify-between">
+      {/* Action buttons - OPTIMIZED COMPACT VERSION */}
+      <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-t border-white/10">
+        <div className="flex items-center gap-2">
           <button
             onClick={toggleDetails}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors transform hover:scale-105 shadow-md"
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors transform hover:scale-105"
             aria-label={expanded ? "Hide details" : "Show details"}
           >
-            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
           
-          <div className="flex items-center bg-black/30 rounded-lg p-1 shadow-inner">
+          <div className="flex items-center bg-black/30 rounded-lg shadow-inner">
             <button
               onClick={decrementQuantity}
-              className="w-7 h-7 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
+              className="w-6 h-6 rounded-l-lg bg-transparent text-white flex items-center justify-center hover:bg-black/40 transition-all"
               aria-label="Decrease quantity"
             >
-              <Minus size={14} />
+              <Minus size={12} />
             </button>
             
-            <span className="mx-2 font-medium text-white w-5 text-center text-base">{quantity}</span>
+            <span className="mx-1 font-medium text-white w-4 text-center text-xs">{quantity}</span>
             
             <button
               onClick={incrementQuantity}
-              className="w-7 h-7 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
+              className="w-6 h-6 rounded-r-lg bg-transparent text-white flex items-center justify-center hover:bg-black/40 transition-all"
               aria-label="Increase quantity"
             >
-              <Plus size={14} />
+              <Plus size={12} />
             </button>
           </div>
         </div>
         
-        {/* New Add to Cart Button */}
+        {/* Compact Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          className="w-full mt-3 py-2.5 rounded-lg bg-[#CA3F3F] text-white font-medium hover:bg-[#b83636] transition-all flex items-center justify-center transform hover:scale-[1.02] active:scale-[0.98] shadow-md"
+          className="flex items-center justify-center px-3 py-1.5 rounded-lg bg-[#CA3F3F]/90 text-white text-sm font-medium hover:bg-[#CA3F3F] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-sm"
+          aria-label="Add to cart"
         >
-          <ShoppingBag size={16} className="mr-2" />
-          Add to Cart · ${(item.price * quantity).toFixed(2)}
+          <ShoppingBag size={14} className="mr-1" />
+          <span>${(item.price * quantity).toFixed(2)}</span>
         </button>
       </div>
       
