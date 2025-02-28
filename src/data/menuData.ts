@@ -103,7 +103,7 @@ export const menuCategories: MenuCategory[] = [
   {
     id: "soups",
     name: "Soups",
-    image: "/lovable-uploads/973e961b-2c3d-4553-ac5c-ba9a8b3182f8.png",
+    image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
     items: [
       {
         id: "tom-yum",
@@ -167,7 +167,7 @@ export const menuCategories: MenuCategory[] = [
   {
     id: "curries",
     name: "Curries",
-    image: "/lovable-uploads/973e961b-2c3d-4553-ac5c-ba9a8b3182f8.png",
+    image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
     items: [
       {
         id: "green-curry",
@@ -180,7 +180,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 450,
         allergens: ["Tree nuts", "Fish sauce"],
         sourcing: "House-made curry paste",
-        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
+        image: "/lovable-uploads/86df8e5d-fceb-4e90-bacb-d58e4d17671d.png",
         options: [
           {
             name: "Protein",
@@ -310,7 +310,7 @@ export const menuCategories: MenuCategory[] = [
   {
     id: "noodles",
     name: "Noodles",
-    image: "/lovable-uploads/973e961b-2c3d-4553-ac5c-ba9a8b3182f8.png",
+    image: "/lovable-uploads/2a0d9389-466b-4819-85ec-ebc9fe25294a.png",
     items: [
       {
         id: "pad-thai",
@@ -398,7 +398,7 @@ export const menuCategories: MenuCategory[] = [
   {
     id: "rice",
     name: "Rice Dishes",
-    image: "/lovable-uploads/973e961b-2c3d-4553-ac5c-ba9a8b3182f8.png",
+    image: "/lovable-uploads/2a0d9389-466b-4819-85ec-ebc9fe25294a.png",
     items: [
       {
         id: "basil-fried-rice",
@@ -463,7 +463,7 @@ export const menuCategories: MenuCategory[] = [
   {
     id: "specials",
     name: "Signature Specials",
-    image: "/lovable-uploads/973e961b-2c3d-4553-ac5c-ba9a8b3182f8.png",
+    image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
     items: [
       {
         id: "duck-curry",
@@ -507,7 +507,7 @@ export const menuCategories: MenuCategory[] = [
   {
     id: "desserts",
     name: "Desserts",
-    image: "/lovable-uploads/973e961b-2c3d-4553-ac5c-ba9a8b3182f8.png",
+    image: "/lovable-uploads/f34c0080-70a9-420a-ae28-e1cebe43cf20.png",
     items: [
       {
         id: "mango-sticky-rice",
@@ -540,7 +540,7 @@ export const menuCategories: MenuCategory[] = [
   {
     id: "drinks",
     name: "Drinks",
-    image: "/lovable-uploads/973e961b-2c3d-4553-ac5c-ba9a8b3182f8.png",
+    image: "/lovable-uploads/f34c0080-70a9-420a-ae28-e1cebe43cf20.png",
     items: [
       {
         id: "thai-tea",

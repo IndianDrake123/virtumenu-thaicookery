@@ -15,6 +15,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [isHovered, setIsHovered] = useState(false);
   const { addToCart } = useCart();
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -106,6 +107,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
         to={`/item/${item.id}`}
         className="block text-current no-underline"
         onClick={() => trackUserInteraction('view_item_detail', { itemId: item.id, itemName: item.name })}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <div className="relative">
           {/* Main image - larger and more prominent */}
@@ -119,7 +122,10 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
                 }`}
                 onLoad={() => setImageLoaded(true)}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+              {/* Only apply gradient overlay when hovered or expanded */}
+              {(isHovered || expanded) && (
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent transition-opacity duration-300"></div>
+              )}
             </div>
           ) : (
             <div className="w-full h-44 bg-gradient-to-b from-[#CA3F3F]/60 to-black/80 flex items-center justify-center">
