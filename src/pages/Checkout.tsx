@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { Loader2 } from "lucide-react";
 import { trackUserInteraction } from "@/utils/analytics";
+import { toast } from "sonner";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -39,6 +40,16 @@ const Checkout = () => {
     // Simulate payment processing
     setTimeout(() => {
       clearCart();
+      
+      // Show a success toast
+      toast.success(
+        <div className="flex flex-col">
+          <span className="font-medium">Order Confirmed!</span>
+          <span className="text-sm text-gray-500">Your food will be ready in approximately 5 minutes</span>
+        </div>,
+        { duration: 4000 }
+      );
+      
       navigate("/thank-you");
     }, 1500);
   };
