@@ -48,6 +48,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 290,
         allergens: ["Gluten", "Soy"],
         sourcing: "All vegetables locally sourced",
+        image: "/lovable-uploads/921d8854-1194-4d62-ba47-b443be058efa.png"
       },
       {
         id: "steamed-dumplings",
@@ -59,6 +60,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 320,
         allergens: ["Shellfish", "Gluten", "Soy"],
         sourcing: "Sustainably sourced shrimp",
+        image: "/lovable-uploads/983b371b-5328-4f14-a8cc-c77311bd1a68.png"
       },
       {
         id: "chicken-satay",
@@ -69,6 +71,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 310,
         allergens: ["Peanuts"],
         sourcing: "Free-range chicken",
+        image: "/lovable-uploads/921d8854-1194-4d62-ba47-b443be058efa.png"
       },
       {
         id: "papaya-salad",
@@ -82,6 +85,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 180,
         allergens: ["Peanuts", "Fish sauce"],
         sourcing: "Fresh locally sourced vegetables",
+        image: "/lovable-uploads/f34c0080-70a9-420a-ae28-e1cebe43cf20.png"
       },
       {
         id: "crispy-calamari",
@@ -92,6 +96,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 340,
         allergens: ["Shellfish", "Gluten", "Eggs"],
         sourcing: "Sustainably sourced calamari",
+        image: "/lovable-uploads/921d8854-1194-4d62-ba47-b443be058efa.png"
       }
     ]
   },
@@ -111,6 +116,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 230,
         allergens: ["Shellfish", "Fish sauce"],
         sourcing: "Authentic Thai herbs and spices",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
         options: [
           {
             name: "Protein",
@@ -132,6 +138,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 350,
         allergens: ["Tree nuts", "Fish sauce"],
         sourcing: "Fresh coconut milk",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
         options: [
           {
             name: "Protein",
@@ -152,7 +159,8 @@ export const menuCategories: MenuCategory[] = [
         protein: 16,
         calories: 280,
         allergens: ["Shellfish", "Gluten", "Soy"],
-        sourcing: "Homemade wontons"
+        sourcing: "Homemade wontons",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png"
       }
     ]
   },
@@ -172,6 +180,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 450,
         allergens: ["Tree nuts", "Fish sauce"],
         sourcing: "House-made curry paste",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
         options: [
           {
             name: "Protein",
@@ -205,6 +214,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 460,
         allergens: ["Tree nuts", "Fish sauce"],
         sourcing: "House-made curry paste",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
         options: [
           {
             name: "Protein",
@@ -238,6 +248,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 480,
         allergens: ["Peanuts", "Tree nuts", "Fish sauce"],
         sourcing: "Authentic Thai spices",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
         options: [
           {
             name: "Protein",
@@ -270,6 +281,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 470,
         allergens: ["Tree nuts"],
         sourcing: "House-made curry paste with turmeric",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png",
         options: [
           {
             name: "Protein",
@@ -310,6 +322,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 520,
         allergens: ["Peanuts", "Eggs", "Fish sauce", "Soy"],
         sourcing: "Traditional recipe with authentic ingredients",
+        image: "/lovable-uploads/2a0d9389-466b-4819-85ec-ebc9fe25294a.png",
         options: [
           {
             name: "Protein",
@@ -332,6 +345,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 540,
         allergens: ["Eggs", "Soy", "Gluten"],
         sourcing: "Fresh rice noodles made daily",
+        image: "/lovable-uploads/2a0d9389-466b-4819-85ec-ebc9fe25294a.png",
         options: [
           {
             name: "Protein",
@@ -355,6 +369,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 530,
         allergens: ["Soy", "Gluten"],
         sourcing: "Fresh Thai basil",
+        image: "/lovable-uploads/2a0d9389-466b-4819-85ec-ebc9fe25294a.png",
         options: [
           {
             name: "Protein",
@@ -395,6 +410,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 510,
         allergens: ["Eggs", "Soy"],
         sourcing: "Jasmine rice, fresh Thai basil",
+        image: "/lovable-uploads/2a0d9389-466b-4819-85ec-ebc9fe25294a.png",
         options: [
           {
             name: "Protein",
@@ -428,6 +444,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 520,
         allergens: ["Tree nuts", "Eggs", "Soy"],
         sourcing: "Fresh pineapple",
+        image: "/lovable-uploads/2a0d9389-466b-4819-85ec-ebc9fe25294a.png",
         options: [
           {
             name: "Protein",
@@ -458,7 +475,8 @@ export const menuCategories: MenuCategory[] = [
         protein: 28,
         calories: 580,
         allergens: ["Tree nuts", "Fish sauce"],
-        sourcing: "Duck sourced from local farms"
+        sourcing: "Duck sourced from local farms",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png"
       },
       {
         id: "seafood-pad-cha",
@@ -470,6 +488,7 @@ export const menuCategories: MenuCategory[] = [
         calories: 490,
         allergens: ["Shellfish", "Fish sauce"],
         sourcing: "Sustainable seafood",
+        image: "/lovable-uploads/2a0d9389-466b-4819-85ec-ebc9fe25294a.png",
         options: [
           {
             name: "Spice Level",
@@ -501,7 +520,8 @@ export const menuCategories: MenuCategory[] = [
         protein: 4,
         calories: 340,
         allergens: ["Tree nuts"],
-        sourcing: "Seasonal fresh mangoes"
+        sourcing: "Seasonal fresh mangoes",
+        image: "/lovable-uploads/f34c0080-70a9-420a-ae28-e1cebe43cf20.png"
       },
       {
         id: "coconut-ice-cream",
@@ -512,7 +532,8 @@ export const menuCategories: MenuCategory[] = [
         protein: 5,
         calories: 290,
         allergens: ["Peanuts", "Tree nuts", "Dairy"],
-        sourcing: "Made in house with fresh coconut"
+        sourcing: "Made in house with fresh coconut",
+        image: "/lovable-uploads/f34c0080-70a9-420a-ae28-e1cebe43cf20.png"
       }
     ]
   },
@@ -530,7 +551,8 @@ export const menuCategories: MenuCategory[] = [
         protein: 2,
         calories: 220,
         allergens: ["Dairy"],
-        sourcing: "Authentic Thai tea leaves"
+        sourcing: "Authentic Thai tea leaves",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png"
       },
       {
         id: "thai-coffee",
@@ -541,7 +563,8 @@ export const menuCategories: MenuCategory[] = [
         protein: 3,
         calories: 230,
         allergens: ["Dairy"],
-        sourcing: "Premium coffee beans"
+        sourcing: "Premium coffee beans",
+        image: "/lovable-uploads/8d408a66-b13d-4b6e-aeac-1579aa09e7cf.png"
       },
       {
         id: "coconut-water",
@@ -552,7 +575,8 @@ export const menuCategories: MenuCategory[] = [
         glutenFree: true,
         protein: 1,
         calories: 90,
-        sourcing: "Young Thai coconuts"
+        sourcing: "Young Thai coconuts",
+        image: "/lovable-uploads/f34c0080-70a9-420a-ae28-e1cebe43cf20.png"
       }
     ]
   }

@@ -18,6 +18,7 @@ interface SearchSuggestion {
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
   const [query, setQuery] = useState('');
+  const [lastQuery, setLastQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -50,6 +51,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
 
     // Track search interaction
     trackUserInteraction('search', { query: searchText });
+    
+    // Save the last query
+    setLastQuery(searchText);
     
     // Process search text
     const searchLower = searchText.toLowerCase();
@@ -206,6 +210,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
 
   const clearSearch = () => {
     setQuery('');
+    setLastQuery('');
     onClear();
   };
 
@@ -214,8 +219,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
       <div className="relative flex items-center">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <img 
-            src="/lovable-uploads/3a7ece4a-b10f-4171-93d5-65943c250b96.png" 
-            alt="Chatbot" 
+            src="/lovable-uploads/d5e5f63b-9160-4ebf-8739-d2ff0366a7f2.png" 
+            alt="AI Assistant" 
             className="h-5 w-5"
           />
         </div>
@@ -227,11 +232,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsExpanded(true)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder="What is the most popular dish?"
+          placeholder={lastQuery ? `Last search: "${lastQuery}"` : "What is the most popular dish?"}
           className="block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all shadow-lg"
         />
         
-        {query && (
+        {(query || lastQuery) && (
           <button 
             onClick={clearSearch}
             className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white"

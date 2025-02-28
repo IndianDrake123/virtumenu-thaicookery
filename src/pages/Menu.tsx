@@ -85,7 +85,7 @@ const Menu = () => {
             <img 
               src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
-              className="h-11 w-11 rounded-full shadow-md animate-pulse-subtle"
+              className="h-11 w-11 rounded-full shadow-md"
             />
           </Link>
           

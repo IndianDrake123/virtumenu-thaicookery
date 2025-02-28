@@ -87,7 +87,7 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
             aria-label="Go to menu"
           >
             <img 
-              src="/lovable-uploads/7961a339-d4e8-4220-8eda-b2b4ed4dff2c.png" 
+              src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
               className="h-9 w-9 rounded-full shadow-md"
             />
