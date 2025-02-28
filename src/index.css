@@ -130,6 +130,10 @@
   .badge-vegan {
     @apply inline-flex items-center justify-center px-3 py-1 text-xs font-medium rounded-full bg-green-900/80 text-white;
   }
+  
+  .shadow-text {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
 }
 
 .animate-fade-in {
