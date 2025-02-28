@@ -149,9 +149,13 @@ function toast({ ...props }: Toast) {
   const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
   
   // Handle success variant (convert to default but keep the class styling)
-  const variant = props.variant === 'success' 
-    ? 'default' 
-    : (props.variant as 'default' | 'destructive' | undefined)
+  let variant: 'default' | 'destructive' | undefined = undefined;
+  
+  if (props.variant === 'success') {
+    variant = 'default';
+  } else if (props.variant === 'default' || props.variant === 'destructive') {
+    variant = props.variant;
+  }
 
   const update = (props: ToasterToast) =>
     dispatch({
