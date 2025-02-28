@@ -137,7 +137,10 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = Omit<ToasterToast, "id">
+type ToastVariant = 'default' | 'destructive' | 'success'
+type Toast = Omit<ToasterToast, "id"> & {
+  variant?: ToastVariant
+}
 
 function toast({ ...props }: Toast) {
   const id = genId()
@@ -146,8 +149,9 @@ function toast({ ...props }: Toast) {
   const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
   
   // Handle success variant (convert to default but keep the class styling)
-  // Use type assertion to handle the variant safely
-  const variant = props.variant === 'success' ? 'default' : props.variant as 'default' | 'destructive' | undefined
+  const variant = props.variant === 'success' 
+    ? 'default' 
+    : (props.variant as 'default' | 'destructive' | undefined)
 
   const update = (props: ToasterToast) =>
     dispatch({
