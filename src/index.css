@@ -136,6 +136,10 @@
   animation: fadeIn 0.4s ease-out;
 }
 
+.animate-fade-out {
+  animation: fadeOut 0.3s ease-out;
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -144,6 +148,17 @@
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
   }
 }
 
@@ -157,6 +172,26 @@
   }
   100% {
     transform: translateY(0);
+  }
+}
+
+/* Pulse subtle animation */
+.animate-pulse-subtle {
+  animation: pulsate 2s ease-in-out infinite;
+}
+
+@keyframes pulsate {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 

@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, AlertTriangle, Award, Zap, Clock, UserCheck } from 'lucide-react';
 import { menuCategories } from '@/data/menuData';
 
 interface SearchBarProps {
@@ -12,6 +12,7 @@ interface SearchSuggestion {
   id: string;
   text: string;
   type: 'faq' | 'query';
+  icon?: React.ReactNode;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
@@ -22,12 +23,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const faqs: SearchSuggestion[] = [
-    { id: 'popular', text: 'What is the most popular dish?', type: 'faq' },
-    { id: 'spicy', text: 'Show me spicy dishes', type: 'faq' },
-    { id: 'vegetarian', text: 'I am vegetarian', type: 'faq' },
-    { id: 'protein', text: 'Which dish has the highest protein?', type: 'faq' },
-    { id: 'gluten', text: 'Show gluten-free options', type: 'faq' },
-    { id: 'spanish', text: 'Spanish menu', type: 'faq' },
+    { id: 'popular', text: 'What is the most popular dish?', type: 'faq', icon: <Award size={16} className="text-amber-400" /> },
+    { id: 'spicy', text: 'Show me spicy dishes', type: 'faq', icon: <Zap size={16} className="text-red-500" /> },
+    { id: 'vegetarian', text: 'I am vegetarian', type: 'faq', icon: <UserCheck size={16} className="text-green-500" /> },
+    { id: 'protein', text: 'Which dish has the highest protein?', type: 'faq', icon: <Award size={16} className="text-blue-500" /> },
+    { id: 'gluten', text: 'Show gluten-free options', type: 'faq', icon: <AlertTriangle size={16} className="text-yellow-500" /> },
+    { id: 'quick', text: 'Quick lunch options', type: 'faq', icon: <Clock size={16} className="text-cyan-500" /> },
   ];
 
   // Close expanded search when clicking outside
@@ -64,6 +65,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
       results = handleGlutenFreeQuery();
     } else if (searchLower.includes('protein') || searchLower.includes('highest protein')) {
       results = handleProteinQuery();
+    } else if (searchLower.includes('quick') || searchLower.includes('fast') || searchLower.includes('lunch')) {
+      results = handleQuickOptions();
     } else if (searchLower.includes('spanish') || searchLower === 'spanish') {
       handleSpanishQuery();
       return;
@@ -149,6 +152,22 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
     };
   };
 
+  const handleQuickOptions = () => {
+    // Filter for items that would be quick to prepare
+    const quickItems = menuCategories
+      .flatMap(category => category.items)
+      .filter(item => 
+        category.id === 'starters' || 
+        category.id === 'soups' || 
+        item.name.toLowerCase().includes('fried rice')
+      );
+
+    return {
+      title: "Quick Lunch Options",
+      items: quickItems
+    };
+  };
+
   const handleSpanishQuery = () => {
     const translations = {
       "Starters": "Entrantes",
@@ -197,7 +216,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
   };
 
   return (
-    <div ref={searchRef} className="relative">
+    <div ref={searchRef} className="relative animate-fade-in">
       <div className="relative flex items-center">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <Search className="h-5 w-5 text-gray-400" />
@@ -211,7 +230,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
           onFocus={() => setIsExpanded(true)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           placeholder="Try asking: 'what is the most popular dish'"
-          className="block w-full pl-10 pr-12 py-3 bg-gray-800 border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all"
+          className="block w-full pl-10 pr-12 py-3.5 bg-gray-800 border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all shadow-md"
         />
         
         {query && (
@@ -256,9 +275,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onClear }) => {
                 <button
                   key={faq.id}
                   onClick={() => handleFaqClick(faq)}
-                  className="text-left p-2 rounded-md hover:bg-gray-700 transition-colors text-gray-300 hover:text-white"
+                  className="text-left p-2.5 rounded-md hover:bg-gray-700 transition-colors text-gray-300 hover:text-white flex items-center"
                 >
-                  {faq.text}
+                  {faq.icon && <span className="mr-2">{faq.icon}</span>}
+                  <span>{faq.text}</span>
                 </button>
               ))}
             </div>
