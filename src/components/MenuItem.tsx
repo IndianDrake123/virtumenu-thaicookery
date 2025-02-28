@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Plus, Minus, Info, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Minus, Info, ChevronDown, ChevronUp, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { MenuItem as MenuItemType } from "@/data/menuData";
 import { useCart } from "@/context/CartContext";
@@ -158,35 +158,46 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
         </div>
       </Link>
       
-      {/* Action buttons - SMALLER VERSION */}
-      <div className="flex justify-between items-center p-2 bg-white/5 border-t border-white/10">
-        <button
-          onClick={toggleDetails}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors transform hover:scale-105 shadow-md"
-          aria-label={expanded ? "Hide details" : "Show details"}
-        >
-          {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
-        
-        <div className="flex items-center bg-black/30 rounded-lg p-1 shadow-inner">
+      {/* Action buttons - ENHANCED VERSION */}
+      <div className="p-3 bg-white/5 border-t border-white/10">
+        <div className="flex items-center justify-between">
           <button
-            onClick={decrementQuantity}
-            className="w-7 h-7 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
-            aria-label="Decrease quantity"
+            onClick={toggleDetails}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors transform hover:scale-105 shadow-md"
+            aria-label={expanded ? "Hide details" : "Show details"}
           >
-            <Minus size={14} />
+            {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
           
-          <span className="mx-2 font-medium text-white w-5 text-center text-base">{quantity}</span>
-          
-          <button
-            onClick={incrementQuantity}
-            className="w-7 h-7 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
-            aria-label="Increase quantity"
-          >
-            <Plus size={14} />
-          </button>
+          <div className="flex items-center bg-black/30 rounded-lg p-1 shadow-inner">
+            <button
+              onClick={decrementQuantity}
+              className="w-7 h-7 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
+              aria-label="Decrease quantity"
+            >
+              <Minus size={14} />
+            </button>
+            
+            <span className="mx-2 font-medium text-white w-5 text-center text-base">{quantity}</span>
+            
+            <button
+              onClick={incrementQuantity}
+              className="w-7 h-7 rounded-full bg-[#CA3F3F] text-white flex items-center justify-center hover:opacity-90 transition-all transform hover:scale-105 shadow-md"
+              aria-label="Increase quantity"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
         </div>
+        
+        {/* New Add to Cart Button */}
+        <button
+          onClick={handleAddToCart}
+          className="w-full mt-3 py-2.5 rounded-lg bg-[#CA3F3F] text-white font-medium hover:bg-[#b83636] transition-all flex items-center justify-center transform hover:scale-[1.02] active:scale-[0.98] shadow-md"
+        >
+          <ShoppingBag size={16} className="mr-2" />
+          Add to Cart · ${(item.price * quantity).toFixed(2)}
+        </button>
       </div>
       
       {/* Expanded details section */}
@@ -259,6 +270,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
               onClick={handleAddToCart}
               className="w-full py-4 rounded-lg bg-[#CA3F3F] text-white font-medium hover:opacity-90 transition-all flex items-center justify-center transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
             >
+              <ShoppingBag size={18} className="mr-2" />
               Add {quantity} to cart · ${(item.price * quantity).toFixed(2)}
             </button>
           </div>
