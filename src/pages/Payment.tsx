@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Cash, Check, ChevronRight, Lock } from "lucide-react";
+import { CreditCard, WalletCards, Check, ChevronRight, Lock } from "lucide-react";
 
 const Payment = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -125,7 +125,7 @@ const Payment = () => {
               }`}
             >
               <div className="flex items-center">
-                <Cash size={20} className="mr-3" />
+                <WalletCards size={20} className="mr-3" />
                 <span>Cash</span>
               </div>
               <ChevronRight size={18} />
