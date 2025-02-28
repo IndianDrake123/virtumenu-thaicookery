@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
-import { Minus, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Minus, Plus, Trash2, ArrowLeft, Clock } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import CartSummary from "@/components/CartSummary";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,6 +22,31 @@ const Cart = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Calculate estimated prep time based on cart items
+  const calculatePrepTime = () => {
+    if (cart.length === 0) return 0;
+    
+    // Base prep time for any order
+    let baseTime = 15;
+    
+    // Add time based on number of items (each item adds 2-5 minutes)
+    const itemTime = cart.reduce((total, item) => {
+      return total + (item.quantity * 3); // 3 minutes per item on average
+    }, 0);
+    
+    // Cap at reasonable maximum time (45 minutes)
+    return Math.min(baseTime + itemTime, 45);
+  };
+  
+  const estimatedPrepTime = calculatePrepTime();
+  
+  // Save prep time to localStorage for use on thank you page
+  useEffect(() => {
+    if (estimatedPrepTime > 0) {
+      localStorage.setItem('estimatedPrepTime', estimatedPrepTime.toString());
+    }
+  }, [estimatedPrepTime]);
 
   if (cart.length === 0) {
     return (
@@ -64,6 +89,23 @@ const Cart = () => {
               className="h-10 w-10 rounded-full shadow-md"
             />
           </Link>
+        </div>
+        
+        {/* Preparation Time Card */}
+        <div className="mx-3 mb-1">
+          <div className="bg-[#CA3F3F]/10 backdrop-blur-sm rounded-xl p-4 border border-[#CA3F3F]/20 shadow-md">
+            <div className="flex items-center">
+              <div className="flex-shrink-0 bg-[#CA3F3F]/20 p-2 rounded-full mr-3">
+                <Clock size={18} className="text-[#CA3F3F]" />
+              </div>
+              <div>
+                <p className="text-white text-sm font-medium">Estimated Preparation Time</p>
+                <p className="text-[#CA3F3F] font-semibold text-lg">
+                  {estimatedPrepTime} minutes
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* Cart Items */}
