@@ -50,7 +50,7 @@ Order online: https://thai-cookery.example.com
   };
   
   return (
-    <Layout title="About Thai Cookery" showHeader={true} showBackButton={true}>
+    <Layout title="About Thai Cookery" showHeader={true} showBackButton={false}>
       <div className="px-4 py-6 max-w-md mx-auto animate-fade-in">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
