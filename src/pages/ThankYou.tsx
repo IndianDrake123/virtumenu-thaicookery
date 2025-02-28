@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Phone, Mail, Star, Gift } from 'lucide-react';
 import { trackUserInteraction } from '@/utils/analytics';
@@ -9,21 +8,16 @@ import { toast } from 'sonner';
 
 const ThankYou = () => {
   const navigate = useNavigate();
-  const [estimatedPrepTime, setEstimatedPrepTime] = useState<number | null>(null);
   const [contactMethod, setContactMethod] = useState<'phone' | 'email'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   
   useEffect(() => {
     // Track page view
     trackUserInteraction('page_view', { page: 'thank_you' });
-    
-    // Load estimated prep time from localStorage
-    const prepTime = localStorage.getItem('estimatedPrepTime');
-    if (prepTime) {
-      setEstimatedPrepTime(parseInt(prepTime, 10));
-    }
   }, []);
 
   const handleSubmitContact = () => {
@@ -50,11 +44,16 @@ const ThankYou = () => {
       <div className="flex flex-col">
         <span className="font-medium">Registration successful!</span>
         <span className="text-sm text-gray-500">
-          You'll receive 19% off your next order
+          You'll receive 10% off your next order
         </span>
       </div>,
       { duration: 4000 }
     );
+  };
+  
+  const handleRatingClick = (index: number) => {
+    setRating(index);
+    trackUserInteraction('set_rating', { rating: index });
   };
   
   return (
@@ -63,18 +62,23 @@ const ThankYou = () => {
       <header className="sticky top-0 z-40 px-4 py-3 bg-black/90 backdrop-blur-md shadow-lg">
         <div className="flex items-center justify-between">
           <button 
-            onClick={() => navigate('/menu')}
-            className="text-white flex items-center hover:text-gray-300 transition-colors"
+            onClick={() => navigate(-1)}
+            className="text-white flex items-center hover:text-gray-300 transition-colors z-10"
           >
             <ArrowLeft size={20} className="mr-2" />
-            <span>Back to Menu</span>
+            <span>Back</span>
           </button>
+          
+          <div className="absolute left-0 right-0 mx-auto flex justify-center">
+            <h1 className="text-lg font-medium">Thank You</h1>
+          </div>
           
           <div className="flex items-center">
             <img 
               src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
               className="h-9 w-9 rounded-full shadow-md"
+              onClick={() => navigate('/about')}
             />
           </div>
         </div>
@@ -82,8 +86,8 @@ const ThankYou = () => {
       
       <main className="px-4 pt-8 pb-16 max-w-md mx-auto">
         {/* Logo and Title */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="bg-gradient-to-r from-red-800 to-red-600 p-2 rounded-full mb-6">
+        <div className="flex flex-col items-center mb-6">
+          <div className="bg-gradient-to-r from-red-800 to-red-600 p-2 rounded-full mb-5">
             <img 
               src="/lovable-uploads/a8416d4e-080d-42c1-b165-a5aa2b783dee.png" 
               alt="Thai Cookery Logo" 
@@ -99,56 +103,68 @@ const ThankYou = () => {
             Your order has been confirmed and will be delivered soon.
           </p>
           
-          {/* Star Rating */}
-          <div className="flex items-center justify-center space-x-1 mb-8">
-            {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                size={24} 
-                className="text-red-500 fill-red-500" 
-              />
+          {/* Interactive Star Rating */}
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            {[1, 2, 3, 4, 5].map((starIndex) => (
+              <button 
+                key={starIndex} 
+                className="focus:outline-none transition-transform hover:scale-110"
+                onMouseEnter={() => setHoverRating(starIndex)}
+                onMouseLeave={() => setHoverRating(0)}
+                onClick={() => handleRatingClick(starIndex)}
+              >
+                <Star 
+                  size={28} 
+                  className={`
+                    ${(hoverRating >= starIndex || rating >= starIndex) 
+                      ? 'text-red-500 fill-red-500' 
+                      : 'text-gray-600 fill-black'} 
+                    transition-colors duration-150
+                  `} 
+                />
+              </button>
             ))}
           </div>
         </div>
         
         {/* Register for Discount Section */}
-        <div className="bg-gray-900/80 rounded-lg p-6 mb-6 border border-gray-800">
+        <div className="bg-gray-900/80 rounded-lg p-6 border border-gray-800">
           <div className="flex items-center mb-3">
             <Gift size={20} className="text-red-500 mr-2" />
             <h2 className="text-lg font-medium">Register for a Special Discount</h2>
           </div>
           
           <p className="text-gray-400 mb-4">
-            Register now to receive <span className="text-red-500 font-medium">19% off</span> your next order!
+            Register now to receive <span className="text-red-500 font-medium">10% off</span> your next order!
           </p>
           
           {!isSubmitted ? (
             <>
               {/* Contact Method Toggle */}
-              <div className="grid grid-cols-2 gap-2 mb-4">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <Button
                   type="button"
                   onClick={() => setContactMethod('phone')}
-                  className={`rounded-lg h-12 flex items-center justify-center ${
+                  className={`rounded-lg flex items-center justify-center ${
                     contactMethod === 'phone'
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
+                      ? 'bg-red-600 hover:bg-red-700 h-14 text-base'
+                      : 'bg-gray-700 hover:bg-gray-600 h-12 text-sm'
+                  } transition-all duration-200`}
                 >
-                  <Phone size={16} className="mr-2" />
+                  <Phone size={contactMethod === 'phone' ? 20 : 16} className="mr-2" />
                   Phone
                 </Button>
                 
                 <Button
                   type="button"
                   onClick={() => setContactMethod('email')}
-                  className={`rounded-lg h-12 flex items-center justify-center ${
+                  className={`rounded-lg flex items-center justify-center ${
                     contactMethod === 'email'
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
+                      ? 'bg-red-600 hover:bg-red-700 h-14 text-base'
+                      : 'bg-gray-700 hover:bg-gray-600 h-12 text-sm'
+                  } transition-all duration-200`}
                 >
-                  <Mail size={16} className="mr-2" />
+                  <Mail size={contactMethod === 'email' ? 20 : 16} className="mr-2" />
                   Email
                 </Button>
               </div>
@@ -191,7 +207,7 @@ const ThankYou = () => {
                 onClick={handleSubmitContact}
                 className="w-full bg-red-600 hover:bg-red-700 h-12 text-white font-medium rounded-lg"
               >
-                Register & Get 19% Off
+                Register & Get 10% Off
               </Button>
               
               <p className="text-gray-500 text-xs text-center mt-3">
@@ -210,7 +226,7 @@ const ThankYou = () => {
                 Thank You for Registering!
               </h3>
               <p className="text-gray-400 text-sm">
-                You'll receive 19% off your next order. We've sent a confirmation to 
+                You'll receive 10% off your next order. We've sent a confirmation to 
                 {contactMethod === 'phone' 
                   ? ` ${phoneNumber}`
                   : ` ${email}`
@@ -219,29 +235,6 @@ const ThankYou = () => {
             </div>
           )}
         </div>
-        
-        {/* Estimated Time Card - This is kept but restyled */}
-        <div className="bg-gray-900/80 rounded-lg p-5 border border-gray-800 mb-6">
-          <h2 className="text-lg font-medium text-white mb-3">Estimated Preparation Time</h2>
-          
-          <div className="text-center">
-            <span className="text-2xl font-bold text-white block mb-1">
-              {estimatedPrepTime || 15} minutes
-            </span>
-            <p className="text-gray-400 text-sm">
-              We're preparing your delicious meal now.
-            </p>
-          </div>
-        </div>
-        
-        {/* Return to Menu Button */}
-        <Button
-          onClick={() => navigate('/menu')}
-          className="w-full bg-red-600 hover:bg-red-700 h-12 text-white font-medium rounded-lg flex items-center justify-center"
-        >
-          <ArrowLeft size={16} className="mr-2" />
-          Return to Menu
-        </Button>
       </main>
     </div>
   );
