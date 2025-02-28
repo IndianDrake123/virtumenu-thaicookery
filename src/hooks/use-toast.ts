@@ -138,7 +138,10 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = Omit<ToasterToast, "id">
+// Update the type to include 'success' as a valid variant
+type Toast = Omit<ToasterToast, "id"> & {
+  variant?: "default" | "destructive" | "success"
+}
 
 function toast({ ...props }: Toast) {
   const id = genId()
@@ -146,9 +149,11 @@ function toast({ ...props }: Toast) {
   // Add custom styling class to make the toast more red
   const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
   
-  // Set success variant styling
-  if (props.variant === 'success') {
-    props.variant = 'default'
+  // Handle 'success' variant by converting it to 'default'
+  let variant = props.variant
+  
+  if (variant === 'success') {
+    variant = 'default'
   }
 
   const update = (props: ToasterToast) =>
@@ -164,6 +169,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       className,
+      variant,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss()

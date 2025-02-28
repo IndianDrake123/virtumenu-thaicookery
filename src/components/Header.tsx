@@ -18,6 +18,7 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showCartTooltip, setShowCartTooltip] = useState(false);
   const [headerTitle, setHeaderTitle] = useState(title || "Thai Cookery");
+  const isAboutPage = location.pathname === "/about";
 
   useEffect(() => {
     if (!title) {
@@ -106,35 +107,31 @@ const Header: React.FC<HeaderProps> = ({ title, showBackButton = true }) => {
               />
             </button>
           ) : (
-            <div className="relative">
-              <button 
-                onClick={location.pathname === "/about" ? () => navigate("/") : handleCartClick}
-                className="p-2 rounded-full hover:bg-gray-800 transition-colors relative"
-                aria-label={location.pathname === "/about" ? "Go to menu" : "Shopping cart"}
-                onMouseEnter={() => setShowCartTooltip(true)}
-                onMouseLeave={() => setShowCartTooltip(false)}
-              >
-                {location.pathname === "/about" ? (
-                  <ArrowLeft size={22} className="text-white" />
-                ) : (
-                  <>
-                    <div className={`absolute inset-0 rounded-full ${showCartTooltip ? 'border-2 border-[#CA3F3F] animate-pulse' : 'border-0'}`}></div>
-                    <ShoppingBag size={22} className="text-white" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-[#CA3F3F] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                        {itemCount}
-                      </span>
-                    )}
-                  </>
+            !isAboutPage && (
+              <div className="relative">
+                <button 
+                  onClick={handleCartClick}
+                  className="p-2 rounded-full hover:bg-gray-800 transition-colors relative"
+                  aria-label="Shopping cart"
+                  onMouseEnter={() => setShowCartTooltip(true)}
+                  onMouseLeave={() => setShowCartTooltip(false)}
+                >
+                  <div className={`absolute inset-0 rounded-full ${showCartTooltip ? 'border-2 border-[#CA3F3F] animate-pulse' : 'border-0'}`}></div>
+                  <ShoppingBag size={22} className="text-white" />
+                  {itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#CA3F3F] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {itemCount}
+                    </span>
+                  )}
+                </button>
+                
+                {showCartTooltip && (
+                  <div className="absolute -bottom-8 right-0 bg-[#CA3F3F] text-white text-xs py-1 px-2 rounded whitespace-nowrap animate-fade-in">
+                    Your Cart
+                  </div>
                 )}
-              </button>
-              
-              {showCartTooltip && location.pathname !== "/about" && (
-                <div className="absolute -bottom-8 right-0 bg-[#CA3F3F] text-white text-xs py-1 px-2 rounded whitespace-nowrap animate-fade-in">
-                  Your Cart
-                </div>
-              )}
-            </div>
+              </div>
+            )
           )}
         </div>
       </div>
