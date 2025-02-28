@@ -158,48 +158,90 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
         </div>
       </Link>
       
-      {/* Action buttons - OPTIMIZED COMPACT VERSION */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white/5 border-t border-white/10">
-        <div className="flex items-center gap-2">
+      {/* Action buttons - SINGLE LINE VERSION */}
+      {expanded ? (
+        <div className="px-4 py-3 bg-white/5 border-t border-white/10 flex items-center justify-between">
           <button
             onClick={toggleDetails}
-            className="flex items-center justify-center w-7 h-7 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors transform hover:scale-105"
-            aria-label={expanded ? "Hide details" : "Show details"}
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors"
+            aria-label="Hide details"
           >
-            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            <ChevronUp size={14} />
           </button>
           
-          <div className="flex items-center bg-black/30 rounded-lg shadow-inner">
-            <button
-              onClick={decrementQuantity}
-              className="w-6 h-6 rounded-l-lg bg-transparent text-white flex items-center justify-center hover:bg-black/40 transition-all"
-              aria-label="Decrease quantity"
-            >
-              <Minus size={12} />
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center bg-black/30 rounded-lg">
+              <button
+                onClick={decrementQuantity}
+                className="w-6 h-6 rounded-l-lg bg-transparent text-white flex items-center justify-center hover:bg-black/40 transition-all"
+                aria-label="Decrease quantity"
+              >
+                <Minus size={12} />
+              </button>
+              
+              <span className="mx-1 font-medium text-white w-4 text-center text-xs">{quantity}</span>
+              
+              <button
+                onClick={incrementQuantity}
+                className="w-6 h-6 rounded-r-lg bg-transparent text-white flex items-center justify-center hover:bg-black/40 transition-all"
+                aria-label="Increase quantity"
+              >
+                <Plus size={12} />
+              </button>
+            </div>
             
-            <span className="mx-1 font-medium text-white w-4 text-center text-xs">{quantity}</span>
-            
             <button
-              onClick={incrementQuantity}
-              className="w-6 h-6 rounded-r-lg bg-transparent text-white flex items-center justify-center hover:bg-black/40 transition-all"
-              aria-label="Increase quantity"
+              onClick={handleAddToCart}
+              className="flex items-center justify-center px-3 py-1.5 rounded-lg bg-[#CA3F3F]/90 text-white text-sm font-medium hover:bg-[#CA3F3F] transition-all"
+              aria-label="Add to cart"
             >
-              <Plus size={12} />
+              <ShoppingBag size={14} className="mr-1" />
+              <span>${(item.price * quantity).toFixed(2)}</span>
             </button>
           </div>
         </div>
-        
-        {/* Compact Add to Cart Button */}
-        <button
-          onClick={handleAddToCart}
-          className="flex items-center justify-center px-3 py-1.5 rounded-lg bg-[#CA3F3F]/90 text-white text-sm font-medium hover:bg-[#CA3F3F] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-sm"
-          aria-label="Add to cart"
-        >
-          <ShoppingBag size={14} className="mr-1" />
-          <span>${(item.price * quantity).toFixed(2)}</span>
-        </button>
-      </div>
+      ) : (
+        <div className="px-4 py-3 bg-white/5 border-t border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleDetails}
+              className="flex items-center justify-center w-7 h-7 rounded-full bg-black/30 text-white hover:bg-black/40 transition-colors"
+              aria-label="Show details"
+            >
+              <ChevronDown size={14} />
+            </button>
+            
+            <div className="flex items-center">
+              <button
+                onClick={decrementQuantity}
+                className="w-6 h-6 rounded-l-md bg-[#CA3F3F]/80 text-white flex items-center justify-center hover:bg-[#CA3F3F] transition-all"
+                aria-label="Decrease quantity"
+              >
+                <Minus size={12} />
+              </button>
+              
+              <span className="w-5 font-medium text-white text-center text-sm">{quantity}</span>
+              
+              <button
+                onClick={incrementQuantity}
+                className="w-6 h-6 rounded-r-md bg-[#CA3F3F]/80 text-white flex items-center justify-center hover:bg-[#CA3F3F] transition-all"
+                aria-label="Increase quantity"
+              >
+                <Plus size={12} />
+              </button>
+            </div>
+          </div>
+          
+          <button
+            onClick={handleAddToCart}
+            className="flex items-center justify-center px-3 py-1.5 rounded-md bg-[#CA3F3F] text-white text-sm font-medium hover:bg-[#CA3F3F]/90 transition-all"
+            aria-label="Add to cart"
+          >
+            <ShoppingBag size={14} className="mr-1" />
+            Add to Cart · ${(item.price * quantity).toFixed(2)}
+          </button>
+        </div>
+      )}
       
       {/* Expanded details section */}
       {expanded && (
