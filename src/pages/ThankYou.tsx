@@ -73,28 +73,23 @@ const ThankYou = () => {
   return (
     <Layout title="Thank You" showHeader={true}>
       <div className="px-4 py-6 max-w-md mx-auto">
-        <div className="text-center mb-10 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#CA3F3F]/20 rounded-full mb-4">
-            <svg className="w-8 h-8 text-[#CA3F3F]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Thank You!</h1>
+        <div className="text-center mb-6 animate-fade-in">
+          <h1 className="text-2xl font-bold text-white mb-2">Thank You!</h1>
           <p className="text-gray-300">Your order has been confirmed and is being prepared.</p>
         </div>
         
         {/* Estimated Time Card */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 shadow-lg mb-6 animate-fade-in">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-[#CA3F3F]/20 p-2 rounded-full">
-              <Clock size={20} className="text-[#CA3F3F]" />
+        <div className="bg-black rounded-xl p-5 border border-white/10 shadow-lg mb-4 animate-fade-in">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="bg-[#CA3F3F]/80 p-2 rounded-full">
+              <Clock size={20} className="text-white" />
             </div>
-            <h2 className="text-lg font-medium text-white">Expected Time Until Ready</h2>
+            <h2 className="text-lg font-medium text-white">Estimated Preparation Time</h2>
           </div>
           
           <div className="text-center py-2">
             <span className="text-3xl font-bold text-white block mb-1">
-              {formatEstimatedTime(estimatedPrepTime)}
+              {estimatedPrepTime || 5} minutes
             </span>
             <p className="text-gray-400">
               We're preparing your delicious meal now.
@@ -103,44 +98,42 @@ const ThankYou = () => {
         </div>
         
         {/* Contact Information Card */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 shadow-lg mb-6 animate-fade-in">
+        <div className="bg-black rounded-xl p-5 border border-white/10 shadow-lg mb-4 animate-fade-in">
           {!isSubmitted ? (
             <>
               <div className="mb-4">
-                <h2 className="text-lg font-medium text-white mb-2">Get Notified</h2>
+                <h2 className="text-xl font-medium text-white mb-2">Get Notified</h2>
                 <p className="text-gray-400 text-sm">
                   Enter your contact information to receive a notification when your order is ready.
                 </p>
               </div>
               
-              <div className="mb-4">
-                <div className="flex gap-3">
-                  <Button
-                    type="button"
-                    onClick={() => setContactMethod('phone')}
-                    className={`flex-1 gap-2 ${
-                      contactMethod === 'phone'
-                        ? 'bg-[#CA3F3F]'
-                        : 'bg-gray-700 hover:bg-gray-600'
-                    }`}
-                  >
-                    <Phone size={16} />
-                    Phone
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    onClick={() => setContactMethod('email')}
-                    className={`flex-1 gap-2 ${
-                      contactMethod === 'email'
-                        ? 'bg-[#CA3F3F]'
-                        : 'bg-gray-700 hover:bg-gray-600'
-                    }`}
-                  >
-                    <Mail size={16} />
-                    Email
-                  </Button>
-                </div>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <Button
+                  type="button"
+                  onClick={() => setContactMethod('phone')}
+                  className={`gap-2 rounded-lg h-12 ${
+                    contactMethod === 'phone'
+                      ? 'bg-[#CA3F3F] hover:bg-[#CA3F3F]/90'
+                      : 'bg-gray-700 hover:bg-gray-600'
+                  }`}
+                >
+                  <Phone size={16} />
+                  Phone
+                </Button>
+                
+                <Button
+                  type="button"
+                  onClick={() => setContactMethod('email')}
+                  className={`gap-2 rounded-lg h-12 ${
+                    contactMethod === 'email'
+                      ? 'bg-[#CA3F3F] hover:bg-[#CA3F3F]/90'
+                      : 'bg-gray-700 hover:bg-gray-600'
+                  }`}
+                >
+                  <Mail size={16} />
+                  Email
+                </Button>
               </div>
               
               {contactMethod === 'phone' && (
@@ -178,7 +171,7 @@ const ThankYou = () => {
               {contactMethod && (
                 <Button
                   onClick={handleSubmitContact}
-                  className="w-full bg-[#CA3F3F] hover:bg-[#a82f2f] h-12 text-white font-medium rounded-lg"
+                  className="w-full bg-[#CA3F3F] hover:bg-[#CA3F3F]/90 h-12 text-white font-medium rounded-lg"
                 >
                   Notify Me When Ready
                 </Button>
@@ -202,45 +195,43 @@ const ThankYou = () => {
           )}
         </div>
         
-        <div className="space-y-4 animate-fade-in">
-          <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 shadow-lg">
-            <h2 className="text-lg font-medium text-white mb-3">What's Next?</h2>
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-start gap-3">
-                <div className="bg-[#CA3F3F]/20 p-1 rounded-full mt-0.5">
-                  <svg className="w-4 h-4 text-[#CA3F3F]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </div>
-                <span>Your food is being freshly prepared by our chefs.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="bg-[#CA3F3F]/20 p-1 rounded-full mt-0.5">
-                  <svg className="w-4 h-4 text-[#CA3F3F]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </div>
-                <span>A server will bring your order to your table when it's ready.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="bg-[#CA3F3F]/20 p-1 rounded-full mt-0.5">
-                  <svg className="w-4 h-4 text-[#CA3F3F]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </div>
-                <span>If you need assistance, please ask any of our staff members.</span>
-              </li>
-            </ul>
-          </div>
-          
-          <Button
-            onClick={() => navigate('/menu')}
-            className="w-full bg-[#CA3F3F] hover:bg-[#a82f2f] h-12 text-white font-medium rounded-lg"
-          >
-            <ArrowLeft size={16} className="mr-2" />
-            Return to Menu
-          </Button>
+        <div className="bg-black rounded-xl p-5 border border-white/10 shadow-lg mb-4 animate-fade-in">
+          <h2 className="text-xl font-medium text-white mb-3">What's Next?</h2>
+          <ul className="space-y-3 text-gray-300">
+            <li className="flex items-start gap-3">
+              <div className="bg-[#CA3F3F]/80 p-1 rounded-full mt-0.5 min-w-[1.5rem] flex justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span>Your food is being freshly prepared by our chefs.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <div className="bg-[#CA3F3F]/80 p-1 rounded-full mt-0.5 min-w-[1.5rem] flex justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span>A server will bring your order to your table when it's ready.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <div className="bg-[#CA3F3F]/80 p-1 rounded-full mt-0.5 min-w-[1.5rem] flex justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <span>If you need assistance, please ask any of our staff members.</span>
+            </li>
+          </ul>
         </div>
+        
+        <Button
+          onClick={() => navigate('/menu')}
+          className="w-full bg-[#CA3F3F] hover:bg-[#CA3F3F]/90 h-12 text-white font-medium rounded-lg flex items-center justify-center"
+        >
+          <ArrowLeft size={16} className="mr-2" />
+          Return to Menu
+        </Button>
       </div>
     </Layout>
   );
