@@ -4,10 +4,11 @@ import Layout from "@/components/Layout";
 import { Minus, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import CartSummary from "@/components/CartSummary";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { trackUserInteraction } from "@/utils/analytics";
 
 const Cart = () => {
+  const navigate = useNavigate();
   const { cart, updateQuantity, removeFromCart, subtotal } = useCart();
   const [isLoaded, setIsLoaded] = useState(false);
   
@@ -45,7 +46,7 @@ const Cart = () => {
         {/* Custom Header */}
         <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-md py-3 px-4 flex justify-between items-center shadow-lg">
           <button 
-            onClick={() => window.history.back()}
+            onClick={() => navigate(-1)}
             className="text-white flex items-center hover:text-[#CA3F3F] transition-colors active:text-[#CA3F3F]"
           >
             <ArrowLeft size={18} className="mr-2" />
@@ -172,7 +173,7 @@ const Cart = () => {
             <button 
               onClick={() => {
                 trackUserInteraction('checkout', { cartTotal: (subtotal + subtotal * 0.095).toFixed(2) });
-                window.location.href = '/checkout';
+                navigate('/checkout');
               }}
               className="w-full bg-[#CA3F3F] text-white font-medium py-3.5 rounded-lg hover:opacity-90 transition-transform transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
             >

@@ -10,6 +10,8 @@ import Cart from "./pages/Cart";
 import Category from "./pages/Category";
 import ItemDetail from "./pages/ItemDetail";
 import NotFound from "./pages/NotFound";
+import Checkout from "./pages/Checkout";
+import ThankYou from "./pages/ThankYou";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
             <Route path="/cart" element={<Cart />} />
             <Route path="/category/:id" element={<Category />} />
             <Route path="/item/:id" element={<ItemDetail />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/thank-you" element={<ThankYou />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>
