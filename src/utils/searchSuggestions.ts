@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import * as LucideIcons from "lucide-react";
 
 export type SearchSuggestion = {
