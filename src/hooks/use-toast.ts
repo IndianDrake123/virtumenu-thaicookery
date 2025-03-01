@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -156,10 +157,13 @@ function toast({ ...props }: Toast) {
   // Map 'success' to 'default' or keep 'default'/'destructive' as is
   if (props.variant) {
     if (props.variant === 'success') {
+      // Success is not a supported variant in the underlying component,
+      // so we map it to 'default' but could add special styling if needed
       variant = 'default'
-    } else if (props.variant === 'default' || props.variant === 'destructive') {
-      variant = props.variant
+    } else if (props.variant === 'destructive') {
+      variant = 'destructive'
     }
+    // For any other case, default to 'default'
   }
 
   const update = (props: ToasterToast) =>
