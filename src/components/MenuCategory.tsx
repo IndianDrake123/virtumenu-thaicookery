@@ -42,29 +42,17 @@ const MenuCategory: React.FC<MenuCategoryProps> = ({
       {!expanded && (
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full flex items-center justify-between rounded-t-xl bg-[#CA3F3F] p-4 transition-all duration-300 ${
-            isOpen ? "shadow-lg" : ""
-          }`}
+          className="w-full flex items-center justify-between p-3 transition-all duration-300"
         >
-          <div className="text-left flex items-center">
-            {category.image && (
-              <div className="w-12 h-12 rounded-lg overflow-hidden mr-3 border border-white/20">
-                <img 
-                  src={category.image} 
-                  alt={category.name} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-            <div>
-              <h3 className="text-lg font-semibold text-white">{category.name}</h3>
-              {category.description && <p className="text-sm text-white/80 mt-1">{category.description}</p>}
-            </div>
+          <div className="text-left flex flex-col items-start">
+            <h3 className="text-sm font-medium text-white tracking-wide">{category.name}</h3>
+            <div className="h-0.5 bg-[#ea384c] w-16 mt-1"></div>
+            {category.description && <p className="text-xs text-white/70 mt-1">{category.description}</p>}
           </div>
           
           {showViewAll && (
             <span className="text-white transition-transform duration-300">
-              {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+              {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
             </span>
           )}
         </button>
@@ -90,7 +78,7 @@ const MenuCategory: React.FC<MenuCategoryProps> = ({
           {!isOpen && showViewAll && category.items.length > 3 && (
             <Link 
               to={`/category/${category.id}`} 
-              className="block text-center py-3 text-[#CA3F3F] font-medium bg-white/10 rounded-lg border border-[#CA3F3F]/30 hover:bg-white/15 transition-all transform hover:scale-[1.01] active:scale-[0.99]"
+              className="block text-center py-3 text-[#ea384c] font-medium bg-white/5 rounded-lg border border-[#ea384c]/30 hover:bg-white/10 transition-all transform hover:scale-[1.01] active:scale-[0.99]"
             >
               View all {category.items.length} items
             </Link>

@@ -37,7 +37,7 @@ const Category = () => {
     return (
       <Layout title="Loading..." showHeader={true}>
         <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#CA3F3F]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#ea384c]"></div>
         </div>
       </Layout>
     );
@@ -50,7 +50,7 @@ const Category = () => {
           <div className="text-red-500 mb-4">Failed to load category data</div>
           <button 
             onClick={() => window.location.reload()} 
-            className="bg-[#CA3F3F] text-white px-4 py-2 rounded-lg"
+            className="bg-[#ea384c] text-white px-4 py-2 rounded-lg"
           >
             Try Again
           </button>
@@ -91,10 +91,11 @@ const Category = () => {
         style={{ backgroundColor: "#000000", color: "#FFFFFF", minHeight: "100vh" }}
       >
         {/* Category Header */}
-        <div className="bg-[#CA3F3F] py-4 px-4 mb-4">
-          <h2 className="text-xl font-bold text-white">{category.name}</h2>
+        <div className="py-4 px-4 mb-4">
+          <h2 className="text-sm font-medium text-white tracking-wide">{category.name}</h2>
+          <div className="h-0.5 bg-[#ea384c] w-20 mt-1"></div>
           {category.description && (
-            <p className="text-white/90 text-sm">{category.description}</p>
+            <p className="text-white/80 text-xs mt-2">{category.description}</p>
           )}
         </div>
         
