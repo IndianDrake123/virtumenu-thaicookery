@@ -3,19 +3,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, AlertTriangle, Award, Zap, Clock, UserCheck, MessageCircle, Search } from 'lucide-react';
 import { menuCategories } from '@/data/menuData';
 import { trackUserInteraction } from '@/utils/analytics';
+import { fetchSearchSuggestions, SearchSuggestion } from '@/utils/searchSuggestions';
+import { useToast } from '@/hooks/use-toast';
 
 interface SearchBarProps {
   onSearchResults: (results: any) => void;
   onClear: () => void;
   currentSearchQuery?: string;
   isSearchActive?: boolean;
-}
-
-interface SearchSuggestion {
-  id: string;
-  text: string;
-  type: 'faq' | 'query';
-  icon?: React.ReactNode;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
@@ -32,8 +27,47 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [animationDirection, setAnimationDirection] = useState<'left' | 'right'>('left');
   const [placeholderVisible, setPlaceholderVisible] = useState(true);
   const [isFocused, setIsFocused] = useState(false);
+  const [faqs, setFaqs] = useState<SearchSuggestion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  
+  // Load suggestions from Supabase when component mounts
+  useEffect(() => {
+    const loadSuggestions = async () => {
+      try {
+        setIsLoading(true);
+        const suggestions = await fetchSearchSuggestions();
+        if (suggestions.length > 0) {
+          setFaqs(suggestions);
+        } else {
+          // Fallback to hardcoded suggestions if database fetch fails
+          console.warn('Using fallback search suggestions');
+          setFaqs([
+            { id: 'popular', text: 'What is the most popular dish?', type: 'faq', icon: <Award size={16} className="text-amber-400" /> },
+            { id: 'spicy', text: 'Show me spicy dishes', type: 'faq', icon: <Zap size={16} className="text-red-500" /> },
+            { id: 'vegetarian', text: 'I am vegetarian', type: 'faq', icon: <UserCheck size={16} className="text-green-500" /> },
+            { id: 'protein', text: 'Which dish has the highest protein?', type: 'faq', icon: <Award size={16} className="text-blue-500" /> },
+            { id: 'gluten', text: 'Show gluten-free options', type: 'faq', icon: <AlertTriangle size={16} className="text-yellow-500" /> },
+            { id: 'quick', text: 'Quick lunch options', type: 'faq', icon: <Clock size={16} className="text-cyan-500" /> },
+            { id: 'spanish', text: 'Menu en español', type: 'faq', icon: <MessageCircle size={16} className="text-purple-500" /> },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error loading search suggestions:', error);
+        toast({
+          title: "Error loading suggestions",
+          description: "Using default suggestions instead",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSuggestions();
+  }, [toast]);
   
   // Update displayQuery when currentSearchQuery changes
   useEffect(() => {
@@ -44,18 +78,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [isSearchActive, currentSearchQuery]);
   
-  const faqs: SearchSuggestion[] = [
-    { id: 'popular', text: 'What is the most popular dish?', type: 'faq', icon: <Award size={16} className="text-amber-400" /> },
-    { id: 'spicy', text: 'Show me spicy dishes', type: 'faq', icon: <Zap size={16} className="text-red-500" /> },
-    { id: 'vegetarian', text: 'I am vegetarian', type: 'faq', icon: <UserCheck size={16} className="text-green-500" /> },
-    { id: 'protein', text: 'Which dish has the highest protein?', type: 'faq', icon: <Award size={16} className="text-blue-500" /> },
-    { id: 'gluten', text: 'Show gluten-free options', type: 'faq', icon: <AlertTriangle size={16} className="text-yellow-500" /> },
-    { id: 'quick', text: 'Quick lunch options', type: 'faq', icon: <Clock size={16} className="text-cyan-500" /> },
-  ];
-
   // Rotate through placeholder suggestions when not in search mode
   useEffect(() => {
-    if (!isSearchActive && !isExpanded) {
+    if (!isSearchActive && !isExpanded && faqs.length > 0) {
       const interval = setInterval(() => {
         // Alternate direction for each animation
         setAnimationDirection(prev => prev === 'left' ? 'right' : 'left');
@@ -296,7 +321,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           placeholder={
             isSearchActive && currentSearchQuery
               ? currentSearchQuery
-              : faqs[placeholderIndex]?.text
+              : faqs[placeholderIndex]?.text || "Search..."
           }
           className={`block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all duration-500 shadow-lg hover:shadow-xl ${
             isFocused ? 'bg-black/80 border-[#CA3F3F]/50 shadow-[0_0_15px_rgba(202,63,63,0.15)]' : 'hover:bg-gray-800/70'
@@ -304,7 +329,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         />
         
         {/* Animated placeholder text that transitions between suggestions */}
-        {!isSearchActive && !query && !displayQuery && (
+        {!isSearchActive && !query && !displayQuery && faqs.length > 0 && (
           <div className="absolute inset-y-0 left-0 pl-10 flex items-center pointer-events-none overflow-hidden">
             <span 
               className={`text-gray-400 transition-all duration-600 ease-in-out ${
@@ -336,22 +361,33 @@ const SearchBar: React.FC<SearchBarProps> = ({
           {/* FAQ suggestions */}
           <div className="px-4 py-2">
             <h3 className="text-sm font-medium text-gray-400 mb-2">Suggested searches</h3>
-            <div className="grid grid-cols-1 gap-2">
-              {faqs.map((faq) => (
-                <button
-                  key={faq.id}
-                  onClick={() => handleFaqClick(faq)}
-                  className="text-left p-2.5 rounded-md hover:bg-gray-700 transition-colors duration-300 text-gray-300 hover:text-white flex items-center group"
-                >
-                  {faq.icon && (
-                    <span className="mr-2 transition-transform duration-300 group-hover:scale-110">
-                      {faq.icon}
-                    </span>
-                  )}
-                  <span>{faq.text}</span>
-                </button>
-              ))}
-            </div>
+            
+            {isLoading ? (
+              <div className="flex justify-center py-4">
+                <div className="animate-pulse flex space-x-2">
+                  <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                  <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                  <div className="h-2 w-2 bg-gray-400 rounded-full"></div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-2">
+                {faqs.map((faq) => (
+                  <button
+                    key={faq.id}
+                    onClick={() => handleFaqClick(faq)}
+                    className="text-left p-2.5 rounded-md hover:bg-gray-700 transition-colors duration-300 text-gray-300 hover:text-white flex items-center group"
+                  >
+                    {faq.icon && (
+                      <span className="mr-2 transition-transform duration-300 group-hover:scale-110">
+                        {faq.icon}
+                      </span>
+                    )}
+                    <span>{faq.text}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
