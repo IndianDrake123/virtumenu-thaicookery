@@ -29,9 +29,13 @@ export async function fetchSearchSuggestions(): Promise<SearchSuggestion[]> {
     // Dynamically get the icon component from Lucide
     let iconComponent = null;
     if (suggestion.icon_name) {
-      const IconComponent = LucideIcons[suggestion.icon_name as keyof typeof LucideIcons];
-      if (IconComponent && typeof IconComponent === 'function') {
-        // Use the Lucide icon as a function directly since it's a React component
+      const IconComponent = LucideIcons[suggestion.icon_name as keyof typeof LucideIcons] as React.ComponentType<{
+        size?: number;
+        className?: string;
+      }>;
+      
+      if (IconComponent) {
+        // Create the icon component correctly
         iconComponent = React.createElement(IconComponent, {
           size: 16,
           className: suggestion.icon_color || ''

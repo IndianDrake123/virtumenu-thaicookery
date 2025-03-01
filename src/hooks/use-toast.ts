@@ -156,11 +156,11 @@ function toast({ ...props }: Toast) {
   
   // Map 'success' to 'default' or keep 'default'/'destructive' as is
   if (props.variant) {
-    if (props.variant === 'success') {
+    if (props.variant === 'success' as ToastVariant) {
       // Success is not a supported variant in the underlying component,
       // so we map it to 'default' but could add special styling if needed
       variant = 'default'
-    } else if (props.variant === 'destructive') {
+    } else if (props.variant === 'destructive' as ToastVariant) {
       variant = 'destructive'
     }
     // For any other case, default to 'default'
