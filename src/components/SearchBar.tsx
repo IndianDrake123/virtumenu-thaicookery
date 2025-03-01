@@ -1,21 +1,14 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { X, AlertTriangle, Award, Zap, Clock, UserCheck, MessageCircle, Search } from 'lucide-react';
 import { menuCategories } from '@/data/menuData';
 import { trackUserInteraction } from '@/utils/analytics';
+import { useSearchSuggestions, type SearchSuggestion } from '@/utils/searchSuggestions';
 
 interface SearchBarProps {
   onSearchResults: (results: any) => void;
   onClear: () => void;
   currentSearchQuery?: string;
   isSearchActive?: boolean;
-}
-
-interface SearchSuggestion {
-  id: string;
-  text: string;
-  type: 'faq' | 'query';
-  icon?: React.ReactNode;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
@@ -35,6 +28,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
+  // Fetch suggestions from Supabase
+  const { suggestions: faqs, loading: suggestionsLoading, error: suggestionsError } = useSearchSuggestions();
+  
   // Update displayQuery when currentSearchQuery changes
   useEffect(() => {
     if (isSearchActive && currentSearchQuery) {
@@ -44,18 +40,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   }, [isSearchActive, currentSearchQuery]);
   
-  const faqs: SearchSuggestion[] = [
-    { id: 'popular', text: 'What is the most popular dish?', type: 'faq', icon: <Award size={16} className="text-amber-400" /> },
-    { id: 'spicy', text: 'Show me spicy dishes', type: 'faq', icon: <Zap size={16} className="text-red-500" /> },
-    { id: 'vegetarian', text: 'I am vegetarian', type: 'faq', icon: <UserCheck size={16} className="text-green-500" /> },
-    { id: 'protein', text: 'Which dish has the highest protein?', type: 'faq', icon: <Award size={16} className="text-blue-500" /> },
-    { id: 'gluten', text: 'Show gluten-free options', type: 'faq', icon: <AlertTriangle size={16} className="text-yellow-500" /> },
-    { id: 'quick', text: 'Quick lunch options', type: 'faq', icon: <Clock size={16} className="text-cyan-500" /> },
-  ];
-
   // Rotate through placeholder suggestions when not in search mode
   useEffect(() => {
-    if (!isSearchActive && !isExpanded) {
+    if (!isSearchActive && !isExpanded && faqs.length > 0) {
       const interval = setInterval(() => {
         // Alternate direction for each animation
         setAnimationDirection(prev => prev === 'left' ? 'right' : 'left');
@@ -279,6 +266,30 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setIsFocused(true);
   };
 
+  // If we're still loading suggestions, show a loading indicator
+  if (suggestionsLoading && faqs.length === 0) {
+    return (
+      <div className="relative animate-fade-in">
+        <div className="relative flex items-center">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white">
+            <Search size={22} strokeWidth={2.5} className="animate-pulse" />
+          </div>
+          <input
+            type="text"
+            placeholder="Loading search suggestions..."
+            className="block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none"
+            disabled
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // If there was an error loading suggestions, show error state but still let users search
+  if (suggestionsError && faqs.length === 0) {
+    console.error('Error loading search suggestions:', suggestionsError);
+  }
+
   return (
     <div ref={searchRef} className="relative animate-fade-in">
       <div className={`relative flex items-center transition-all duration-300 ${isFocused ? 'transform scale-[1.02]' : ''}`}>
@@ -296,7 +307,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           placeholder={
             isSearchActive && currentSearchQuery
               ? currentSearchQuery
-              : faqs[placeholderIndex]?.text
+              : faqs[placeholderIndex]?.text || "Search menu..."
           }
           className={`block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all duration-500 shadow-lg hover:shadow-xl ${
             isFocused ? 'bg-black/80 border-[#CA3F3F]/50 shadow-[0_0_15px_rgba(202,63,63,0.15)]' : 'hover:bg-gray-800/70'
@@ -304,7 +315,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         />
         
         {/* Animated placeholder text that transitions between suggestions */}
-        {!isSearchActive && !query && !displayQuery && (
+        {!isSearchActive && !query && !displayQuery && faqs.length > 0 && (
           <div className="absolute inset-y-0 left-0 pl-10 flex items-center pointer-events-none overflow-hidden">
             <span 
               className={`text-gray-400 transition-all duration-600 ease-in-out ${
@@ -315,7 +326,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                       : 'translate-y-8'}`
               }`}
             >
-              {faqs[placeholderIndex]?.text}
+              {faqs[placeholderIndex]?.text || ""}
             </span>
           </div>
         )}
@@ -337,20 +348,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <div className="px-4 py-2">
             <h3 className="text-sm font-medium text-gray-400 mb-2">Suggested searches</h3>
             <div className="grid grid-cols-1 gap-2">
-              {faqs.map((faq) => (
-                <button
-                  key={faq.id}
-                  onClick={() => handleFaqClick(faq)}
-                  className="text-left p-2.5 rounded-md hover:bg-gray-700 transition-colors duration-300 text-gray-300 hover:text-white flex items-center group"
-                >
-                  {faq.icon && (
-                    <span className="mr-2 transition-transform duration-300 group-hover:scale-110">
-                      {faq.icon}
-                    </span>
-                  )}
-                  <span>{faq.text}</span>
-                </button>
-              ))}
+              {faqs.length > 0 ? (
+                faqs.map((faq) => (
+                  <button
+                    key={faq.id}
+                    onClick={() => handleFaqClick(faq)}
+                    className="text-left p-2.5 rounded-md hover:bg-gray-700 transition-colors duration-300 text-gray-300 hover:text-white flex items-center group"
+                  >
+                    {faq.icon && (
+                      <span className="mr-2 transition-transform duration-300 group-hover:scale-110">
+                        {faq.icon}
+                      </span>
+                    )}
+                    <span>{faq.text}</span>
+                  </button>
+                ))
+              ) : (
+                <div className="text-gray-400 text-center py-2">No suggestions available</div>
+              )}
             </div>
           </div>
         </div>
