@@ -38,13 +38,10 @@ const Checkout = () => {
     return storedTip ? parseFloat(storedTip) : 0;
   };
 
-  const getTaxAmount = () => {
-    const storedTax = localStorage.getItem('taxAmount');
-    return storedTax ? parseFloat(storedTax) : (subtotal * 0.095);
-  };
-
+  // Calculate tax directly from subtotal with fixed rate of 9.5%
+  const taxRate = 0.095;
+  const taxAmount = subtotal * taxRate;
   const tipAmount = getTipAmount();
-  const taxAmount = getTaxAmount();
   const totalAmount = subtotal + taxAmount + tipAmount;
 
   useEffect(() => {
@@ -145,8 +142,8 @@ const Checkout = () => {
               </div>
               
               <p className="text-gray-400 text-sm">
-                Each item in your order adds approximately 3 minutes to the preparation time.
-                Your order has {cart.reduce((total, item) => total + item.quantity, 0)} item(s).
+                Each item in your order adds approximately 3 minutes to the preparation time. Your
+                order has {cart.reduce((total, item) => total + item.quantity, 0)} item(s).
               </p>
             </div>
 
