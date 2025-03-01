@@ -80,6 +80,7 @@ export type MenuItemWithDetails = MenuItem & {
   dish_story?: string;
 };
 
+// Frontend representation of menu item options
 export type MenuItemOption = {
   name: string;
   choices: {

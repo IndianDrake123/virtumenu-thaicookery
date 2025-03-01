@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { 
   MenuCategory, 
@@ -8,7 +7,8 @@ import {
   Allergen,
   OptionGroup,
   OptionChoice,
-  Tag
+  Tag,
+  MenuItemOption
 } from "@/models/types";
 
 // Fetch all active menu categories ordered by sort_order
