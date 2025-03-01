@@ -31,6 +31,7 @@ export async function fetchSearchSuggestions(): Promise<SearchSuggestion[]> {
     if (suggestion.icon_name) {
       const IconComponent = LucideIcons[suggestion.icon_name as keyof typeof LucideIcons];
       if (IconComponent) {
+        // Fixed syntax for creating the React element
         iconComponent = <IconComponent size={16} className={suggestion.icon_color || ''} />;
       }
     }
