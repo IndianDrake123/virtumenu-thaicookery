@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
-import { menuCategories } from "@/data/menuData";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Info, Check } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
+import { useMenuItemBySlug } from "@/hooks/useMenu";
+import { fetchMenuItemStory } from "@/services/menuService";
 
 const ItemDetail = () => {
   const { id } = useParams<{id: string}>();
@@ -17,18 +18,19 @@ const ItemDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [specialInstructions, setSpecialInstructions] = useState("");
   const [selectedOptions, setSelectedOptions] = useState<Record<string, {choice: string, price?: number}>>({});
+  const [itemStory, setItemStory] = useState<string | null>(null);
   
-  // Find the item across all categories
-  const item = menuCategories.flatMap(c => c.items).find(i => i.id === id);
+  // Fetch menu item from database
+  const { item, loading, error } = useMenuItemBySlug(id);
   
   useEffect(() => {
-    if (!item) {
+    if (loading === false && !item) {
       navigate('/');
       return;
     }
     
     // Set default options for required choices
-    if (item.options) {
+    if (item?.options) {
       const defaultSelections = item.options.reduce((acc, option) => {
         if (option.required && option.choices.length > 0) {
           acc[option.name] = {
@@ -41,13 +43,53 @@ const ItemDetail = () => {
       
       setSelectedOptions(defaultSelections);
     }
+
+    // Fetch the dish story
+    if (item) {
+      const fetchStory = async () => {
+        try {
+          const story = await fetchMenuItemStory(item.id);
+          setItemStory(story);
+        } catch (err) {
+          console.error("Error fetching dish story:", err);
+        }
+      };
+      
+      fetchStory();
+    }
     
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [item, navigate]);
+  }, [item, loading, navigate]);
+  
+  if (loading && !isLoaded) {
+    return (
+      <Layout title="Loading..." showHeader={true}>
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#CA3F3F]"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout title="Error" showHeader={true}>
+        <div className="flex flex-col items-center justify-center h-screen p-4">
+          <div className="text-red-500 mb-4">Failed to load item details</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-[#CA3F3F] text-white px-4 py-2 rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </Layout>
+    );
+  }
   
   if (!item) return null;
 
@@ -89,10 +131,13 @@ const ItemDetail = () => {
   const optionsTotal = Object.values(selectedOptions).reduce((sum, { price }) => sum + (price || 0), 0);
   const totalPrice = (item.price + optionsTotal) * quantity;
 
-  // Generate a story based on the dish name
+  // Get dish story from database or fallback to hardcoded stories if not found
   const getDishStory = () => {
+    if (itemStory) return itemStory;
+    
+    // Fallback to hardcoded stories
     const stories = {
-      'thai-spring-rolls': 'Handcrafted by our chef who learned the technique from his grandmother in Bangkok. These spring rolls quickly became a customer favorite when Thai Cookery first opened. The delicate crunch and aromatic filling represent our commitment to authentic Thai flavors.',
+      'spring-rolls': 'Handcrafted by our chef who learned the technique from his grandmother in Bangkok. These spring rolls quickly became a customer favorite when Thai Cookery first opened. The delicate crunch and aromatic filling represent our commitment to authentic Thai flavors.',
       'steamed-dumplings': 'Chef Somchai discovered this recipe during his travels through Northern Thailand\'s mountain villages. Brought to New York and refined over five years, these dumplings capture the essence of Thai Cookery\'s fusion of tradition and innovation.',
       'pad-thai': 'Our Pad Thai recipe was passed down through three generations of the owner\'s family in Bangkok. When Thai Cookery opened in New York, locals immediately recognized the authentic blend of sweet, sour, and umami flavors. It remains our signature dish that brings customers back again and again.',
       'green-curry': 'Our Green Curry recipe originated in the kitchen of a small Bangkok street vendor who taught our founder the perfect balance of spices. The distinctive aroma has become synonymous with Thai Cookery\'s commitment to authentic flavors. Each batch of curry paste is made fresh daily using traditional mortar and pestle methods.',

@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { X, AlertTriangle, Award, Zap, Clock, UserCheck, MessageCircle, Search } from 'lucide-react';
-import { menuCategories } from '@/data/menuData';
-import { trackUserInteraction } from '@/utils/analytics';
-import { useSearchSuggestions, type SearchSuggestion } from '@/utils/searchSuggestions';
+import React, { useState, useEffect, useRef } from "react";
+import { Search, X, Clock, Flame, Star } from "lucide-react";
+import { useSearchSuggestions } from "@/utils/searchSuggestions";
+import { searchMenuItems } from "@/services/menuService";
+import { trackUserInteraction } from "@/utils/analytics";
 
 interface SearchBarProps {
   onSearchResults: (results: any) => void;
@@ -14,65 +14,40 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ 
   onSearchResults, 
   onClear, 
-  currentSearchQuery = '',
+  currentSearchQuery = "",
   isSearchActive = false
 }) => {
-  const [query, setQuery] = useState('');
-  const [displayQuery, setDisplayQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [animationDirection, setAnimationDirection] = useState<'left' | 'right'>('left');
-  const [placeholderVisible, setPlaceholderVisible] = useState(true);
-  const [isFocused, setIsFocused] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
+  const [query, setQuery] = useState(currentSearchQuery);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
   // Fetch suggestions from Supabase
   const { suggestions: faqs, loading: suggestionsLoading, error: suggestionsError } = useSearchSuggestions();
-  
-  // Update displayQuery when currentSearchQuery changes
-  useEffect(() => {
-    if (isSearchActive && currentSearchQuery) {
-      setDisplayQuery(currentSearchQuery);
-    } else {
-      setDisplayQuery('');
-    }
-  }, [isSearchActive, currentSearchQuery]);
-  
-  // Rotate through placeholder suggestions when not in search mode
-  useEffect(() => {
-    if (!isSearchActive && !isExpanded && faqs.length > 0) {
-      const interval = setInterval(() => {
-        // Alternate direction for each animation
-        setAnimationDirection(prev => prev === 'left' ? 'right' : 'left');
-        
-        // Start fade out animation
-        setIsAnimating(true);
-        setPlaceholderVisible(false);
-        
-        // After fade out, change the text and fade in
-        setTimeout(() => {
-          setPlaceholderIndex(prev => (prev + 1) % faqs.length);
-          setPlaceholderVisible(true);
-          
-          // Reset animation state after completing the transition
-          setTimeout(() => {
-            setIsAnimating(false);
-          }, 600);
-        }, 600);
-      }, 10000); // Change every 10 seconds as requested
-      
-      return () => clearInterval(interval);
-    }
-  }, [isSearchActive, isExpanded, faqs.length]);
 
-  // Close expanded search when clicking outside
+  // Set query from prop if changed externally
+  useEffect(() => {
+    setQuery(currentSearchQuery);
+  }, [currentSearchQuery]);
+
+  // Auto focus input when expanded
+  useEffect(() => {
+    if (isExpanded && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isExpanded]);
+
+  // Close suggestions on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsExpanded(false);
-        setIsFocused(false);
+      if (
+        suggestionsRef.current && 
+        !suggestionsRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
       }
     };
 
@@ -82,292 +57,208 @@ const SearchBar: React.FC<SearchBarProps> = ({
     };
   }, []);
 
-  const handleSearch = (searchText: string = query || displayQuery) => {
-    // If search input is empty, clear search and return to default menu
-    if (!searchText.trim()) {
-      clearSearch();
-      return;
-    }
-
-    // Track search interaction
-    trackUserInteraction('search', { query: searchText });
-    
-    // Process search text
-    const searchLower = searchText.toLowerCase();
-    let results;
-
-    if (searchLower.includes('popular') || searchLower.includes('best seller')) {
-      results = handlePopularQuery();
-    } else if (searchLower.includes('spicy') || searchLower.includes('spiciest')) {
-      results = handleSpicyQuery();
-    } else if (searchLower.includes('vegetarian') || searchLower.includes('vegan')) {
-      results = handleVegetarianQuery();
-    } else if (searchLower.includes('gluten')) {
-      results = handleGlutenFreeQuery();
-    } else if (searchLower.includes('protein') || searchLower.includes('highest protein')) {
-      results = handleProteinQuery();
-    } else if (searchLower.includes('quick') || searchLower.includes('fast') || searchLower.includes('lunch')) {
-      results = handleQuickOptions();
-    } else if (searchLower.includes('spanish') || searchLower === 'spanish') {
-      handleSpanishQuery();
-      return;
-    } else {
-      // General text search
-      results = textSearch(searchLower);
-    }
-
-    // Pass results up to parent component
-    onSearchResults(results);
-    
-    // Clear search field
-    setQuery('');
-    setIsExpanded(false);
-  };
-
-  const handleFaqClick = (faq: SearchSuggestion) => {
-    // Track FAQ click
-    trackUserInteraction('faq_click', { faq: faq.text });
-    
-    setQuery(faq.text);
-    handleSearch(faq.text);
-  };
-
-  const handleProteinQuery = () => {
-    // Sort all menu items by protein content
-    const allItems = menuCategories.flatMap(category => category.items);
-    const sortedByProtein = [...allItems]
-      .filter(item => item.protein !== undefined)
-      .sort((a, b) => (b.protein || 0) - (a.protein || 0))
-      .slice(0, 5);
-
-    return {
-      title: "Highest Protein Dishes",
-      items: sortedByProtein
-    };
-  };
-
-  const handleSpicyQuery = () => {
-    const spicyItems = menuCategories
-      .flatMap(category => category.items)
-      .filter(item => item.spicy);
-
-    return {
-      title: "Spicy Dishes",
-      items: spicyItems
-    };
-  };
-
-  const handleVegetarianQuery = () => {
-    const vegItems = menuCategories
-      .flatMap(category => category.items)
-      .filter(item => item.vegetarian);
-
-    return {
-      title: "Vegetarian Options",
-      items: vegItems
-    };
-  };
-
-  const handleGlutenFreeQuery = () => {
-    const gfItems = menuCategories
-      .flatMap(category => category.items)
-      .filter(item => item.glutenFree);
-
-    return {
-      title: "Gluten-Free Options",
-      items: gfItems
-    };
-  };
-
-  const handlePopularQuery = () => {
-    const popularItems = menuCategories
-      .flatMap(category => category.items)
-      .filter(item => item.popular);
-
-    return {
-      title: "Most Popular Dishes",
-      items: popularItems
-    };
-  };
-
-  const handleQuickOptions = () => {
-    // Filter for items that would be quick to prepare
-    const quickItems = menuCategories
-      .flatMap(category => category.items)
-      .filter(item => {
-        const categoryId = menuCategories.find(cat => 
-          cat.items.some(i => i.id === item.id)
-        )?.id;
-        
-        return categoryId === 'starters' || 
-               categoryId === 'soups' || 
-               item.name.toLowerCase().includes('fried rice');
-      });
-
-    return {
-      title: "Quick Lunch Options",
-      items: quickItems
-    };
-  };
-
-  const handleSpanishQuery = () => {
-    const translations = {
-      "Starters": "Entrantes",
-      "Soups": "Sopas",
-      "Curries": "Curry",
-      "Noodles": "Fideos",
-      "Rice Dishes": "Platos de Arroz",
-      "Signature Specials": "Especialidades",
-      "Desserts": "Postres",
-      "Drinks": "Bebidas"
-    };
-
-    const spanishResponse = "¡Aquí está nuestro menú en español!\n\n" + 
-      Object.entries(translations).map(([eng, spa]) => `${eng} → ${spa}`).join('\n');
-
-    // Return empty results to show the conversation
-    return {
-      title: "Spanish Menu",
-      items: []
-    };
-  };
-
-  const textSearch = (searchText: string) => {
-    const allItems = menuCategories.flatMap(category => category.items);
-    const matchedItems = allItems.filter(item => 
-      item.name.toLowerCase().includes(searchText) || 
-      item.description.toLowerCase().includes(searchText)
-    );
-
-    return {
-      title: `Search Results for "${searchText}"`,
-      items: matchedItems
-    };
-  };
-
-  const clearSearch = () => {
-    setQuery('');
-    setDisplayQuery('');
-    onClear();
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Always update the query state with input value
-    setQuery(e.target.value);
-    
-    // When user starts typing in search mode, clear the display query
-    if (isSearchActive) {
-      setDisplayQuery('');
-    }
-  };
-
   const handleFocus = () => {
     setIsExpanded(true);
-    setIsFocused(true);
+    if (query.length > 0) {
+      setShowSuggestions(true);
+    }
   };
 
-  // If we're still loading suggestions, show a loading indicator
-  if (suggestionsLoading && faqs.length === 0) {
-    return (
-      <div className="relative animate-fade-in">
-        <div className="relative flex items-center">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-white">
-            <Search size={22} strokeWidth={2.5} className="animate-pulse" />
-          </div>
-          <input
-            type="text"
-            placeholder="Loading search suggestions..."
-            className="block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none"
-            disabled
-          />
-        </div>
-      </div>
-    );
-  }
+  const handleClear = () => {
+    setQuery("");
+    setIsExpanded(false);
+    setShowSuggestions(false);
+    onClear();
+    
+    if (inputRef.current) {
+      inputRef.current.blur();
+    }
+  };
 
-  // If there was an error loading suggestions, show error state but still let users search
-  if (suggestionsError && faqs.length === 0) {
-    console.error('Error loading search suggestions:', suggestionsError);
-  }
+  const handleSearchClick = () => {
+    if (!isExpanded) {
+      setIsExpanded(true);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    } else if (query.trim()) {
+      handleSearch();
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setQuery(suggestion);
+    handleSearch(suggestion);
+    
+    // Track suggestion click
+    trackUserInteraction('search_suggestion_click', { suggestion });
+  };
+
+  const handleSearch = async (searchQuery?: string) => {
+    const finalQuery = searchQuery || query;
+    if (!finalQuery.trim()) return;
+    
+    setShowSuggestions(false);
+    
+    try {
+      // Use the new search function from menuService
+      const results = await searchMenuItems(finalQuery);
+      
+      onSearchResults({
+        title: `Search Results for "${finalQuery}"`,
+        items: results
+      });
+      
+      // Track search
+      trackUserInteraction('search', { query: finalQuery, resultsCount: results.length });
+    } catch (error) {
+      console.error("Search error:", error);
+      onSearchResults({
+        title: `Search Results for "${finalQuery}"`,
+        items: []
+      });
+    }
+  };
+
+  const recentSearches = [
+    "Pad Thai", 
+    "Curry", 
+    "Vegetarian", 
+    "Spicy"
+  ];
 
   return (
-    <div ref={searchRef} className="relative animate-fade-in">
-      <div className={`relative flex items-center transition-all duration-300 ${isFocused ? 'transform scale-[1.02]' : ''}`}>
-        <div className={`absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none transition-all duration-300 ${isFocused ? 'text-[#CA3F3F]' : 'text-white'}`}>
-          <Search size={22} strokeWidth={2.5} className="transition-all duration-300" />
-        </div>
+    <div className="relative w-full">
+      <div 
+        className={`flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-xl px-3 py-2 transition-all duration-300 shadow-sm ${
+          isExpanded ? "shadow" : ""
+        }`}
+      >
+        <button 
+          onClick={handleSearchClick} 
+          className="text-gray-400 hover:text-white transition-colors"
+          aria-label="Search"
+        >
+          <Search size={20} />
+        </button>
         
         <input
           ref={inputRef}
           type="text"
-          value={query || displayQuery}
-          onChange={handleInputChange}
+          placeholder="Search menu..."
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            if (e.target.value.length > 0) {
+              setShowSuggestions(true);
+            } else {
+              setShowSuggestions(false);
+            }
+          }}
           onFocus={handleFocus}
-          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          placeholder={
-            isSearchActive && currentSearchQuery
-              ? currentSearchQuery
-              : faqs[placeholderIndex]?.text || "Search menu..."
-          }
-          className={`block w-full pl-10 pr-12 py-3.5 bg-gray-800/90 backdrop-blur-sm border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#CA3F3F] focus:border-transparent transition-all duration-500 shadow-lg hover:shadow-xl ${
-            isFocused ? 'bg-black/80 border-[#CA3F3F]/50 shadow-[0_0_15px_rgba(202,63,63,0.15)]' : 'hover:bg-gray-800/70'
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearch();
+            }
+          }}
+          className={`bg-transparent border-none focus:outline-none text-white placeholder-gray-500 text-sm flex-grow transition-all duration-300 ${
+            isExpanded ? "px-3 w-full" : "px-1 w-0"
           }`}
         />
         
-        {/* Animated placeholder text that transitions between suggestions */}
-        {!isSearchActive && !query && !displayQuery && faqs.length > 0 && (
-          <div className="absolute inset-y-0 left-0 pl-10 flex items-center pointer-events-none overflow-hidden">
-            <span 
-              className={`text-gray-400 transition-all duration-600 ease-in-out ${
-                placeholderVisible 
-                  ? 'opacity-100 transform translate-y-0' 
-                  : `opacity-0 transform ${animationDirection === 'left' 
-                      ? '-translate-y-8' 
-                      : 'translate-y-8'}`
-              }`}
-            >
-              {faqs[placeholderIndex]?.text || ""}
-            </span>
-          </div>
-        )}
-        
-        {(query || displayQuery) && (
+        {isExpanded && query && (
           <button 
-            onClick={clearSearch}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors duration-300"
+            onClick={handleClear} 
+            className="text-gray-400 hover:text-white transition-colors"
+            aria-label="Clear search"
           >
-            <X className="h-5 w-5" />
+            <X size={18} />
           </button>
         )}
       </div>
       
-      {/* Expanded Search with FAQs */}
-      {isExpanded && (
-        <div className="absolute top-full left-0 right-0 mt-2 py-2 bg-gray-800/95 backdrop-blur-md rounded-lg shadow-xl border border-gray-700/50 z-40 max-h-96 overflow-y-auto animate-fade-in">
-          {/* FAQ suggestions */}
-          <div className="px-4 py-2">
-            <h3 className="text-sm font-medium text-gray-400 mb-2">Suggested searches</h3>
-            <div className="grid grid-cols-1 gap-2">
-              {faqs.length > 0 ? (
-                faqs.map((faq) => (
-                  <button
-                    key={faq.id}
-                    onClick={() => handleFaqClick(faq)}
-                    className="text-left p-2.5 rounded-md hover:bg-gray-700 transition-colors duration-300 text-gray-300 hover:text-white flex items-center group"
-                  >
-                    {faq.icon && (
-                      <span className="mr-2 transition-transform duration-300 group-hover:scale-110">
-                        {faq.icon}
-                      </span>
-                    )}
-                    <span>{faq.text}</span>
-                  </button>
-                ))
-              ) : (
-                <div className="text-gray-400 text-center py-2">No suggestions available</div>
-              )}
+      {/* Search Suggestions Panel */}
+      {showSuggestions && (
+        <div 
+          ref={suggestionsRef}
+          className="absolute z-20 mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl overflow-hidden animate-in fade-in duration-300"
+        >
+          {/* Recent searches */}
+          <div className="p-4">
+            <h3 className="text-gray-400 text-xs font-medium mb-2 flex items-center">
+              <Clock size={14} className="mr-1" />
+              RECENT SEARCHES
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {recentSearches.map((search, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleSuggestionClick(search)}
+                  className="text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full text-sm transition-colors"
+                >
+                  {search}
+                </button>
+              ))}
             </div>
           </div>
+          
+          {/* Popular and suggestions */}
+          <div className="border-t border-white/5">
+            <div className="p-4">
+              <h3 className="text-gray-400 text-xs font-medium mb-2 flex items-center">
+                <Flame size={14} className="mr-1" />
+                POPULAR DISHES
+              </h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => handleSuggestionClick("Green Curry")}
+                  className="w-full text-left text-white hover:bg-white/5 p-2 rounded flex items-center transition-colors"
+                >
+                  <Star className="text-yellow-500 mr-2" size={16} />
+                  Green Curry
+                </button>
+                <button
+                  onClick={() => handleSuggestionClick("Pad Thai")}
+                  className="w-full text-left text-white hover:bg-white/5 p-2 rounded flex items-center transition-colors"
+                >
+                  <Star className="text-yellow-500 mr-2" size={16} />
+                  Pad Thai
+                </button>
+                <button
+                  onClick={() => handleSuggestionClick("Thai Spring Rolls")}
+                  className="w-full text-left text-white hover:bg-white/5 p-2 rounded flex items-center transition-colors"
+                >
+                  <Star className="text-yellow-500 mr-2" size={16} />
+                  Thai Spring Rolls
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {/* FAQs and search suggestions */}
+          {faqs && faqs.length > 0 && (
+            <div className="border-t border-white/5">
+              <div className="p-4">
+                <h3 className="text-gray-400 text-xs font-medium mb-2">
+                  SUGGESTED SEARCHES
+                </h3>
+                <div className="space-y-2">
+                  {faqs.map((faq) => (
+                    <button
+                      key={faq.id}
+                      onClick={() => handleSuggestionClick(faq.text)}
+                      className="w-full text-left text-white hover:bg-white/5 p-2 rounded flex items-center transition-colors"
+                    >
+                      {faq.icon && (
+                        <span className="mr-2">{faq.icon}</span>
+                      )}
+                      {faq.text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

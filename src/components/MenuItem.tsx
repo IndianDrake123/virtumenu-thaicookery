@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { MenuItem as MenuItemType } from "@/data/menuData";
 import { useCart } from "@/context/CartContext";
 import { trackUserInteraction } from "@/utils/analytics";
+import { fetchMenuItemStory } from "@/services/menuService";
 
 interface MenuItemProps {
   item: MenuItemType;
@@ -16,7 +17,27 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
   const [expanded, setExpanded] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isHovered, setIsHovered] = useState(false);
+  const [itemStory, setItemStory] = useState<string | null>(null);
   const { addToCart } = useCart();
+
+  // Fetch dish story if expanded and not already loaded
+  React.useEffect(() => {
+    if (expanded && !itemStory) {
+      const fetchStory = async () => {
+        try {
+          // You can implement this function to fetch the story from the database
+          const story = await fetchMenuItemStory(item.id);
+          if (story) {
+            setItemStory(story);
+          }
+        } catch (err) {
+          console.error("Error fetching dish story:", err);
+        }
+      };
+      
+      fetchStory();
+    }
+  }, [expanded, item.id, itemStory]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -90,8 +111,11 @@ const MenuItem: React.FC<MenuItemProps> = ({ item, compact = false }) => {
 
   // Generate a story based on the dish name
   const getDishStory = () => {
+    if (itemStory) return itemStory;
+    
+    // Fallback to hardcoded stories if database story not available
     const stories = {
-      'thai-spring-rolls': 'Handcrafted by our chef who learned the technique from his grandmother in Bangkok. These spring rolls quickly became a customer favorite when Thai Cookery first opened. The delicate crunch and aromatic filling represent our commitment to authentic Thai flavors.',
+      'spring-rolls': 'Handcrafted by our chef who learned the technique from his grandmother in Bangkok. These spring rolls quickly became a customer favorite when Thai Cookery first opened. The delicate crunch and aromatic filling represent our commitment to authentic Thai flavors.',
       'steamed-dumplings': 'Chef Somchai discovered this recipe during his travels through Northern Thailand\'s mountain villages. Brought to New York and refined over five years, these dumplings capture the essence of Thai Cookery\'s fusion of tradition and innovation.',
       'pad-thai': 'Our Pad Thai recipe was passed down through three generations of the owner\'s family in Bangkok. When Thai Cookery opened in New York, locals immediately recognized the authentic blend of sweet, sour, and umami flavors. It remains our signature dish that brings customers back again and again.',
       'green-curry': 'Our Green Curry recipe originated in the kitchen of a small Bangkok street vendor who taught our founder the perfect balance of spices. The distinctive aroma has become synonymous with Thai Cookery\'s commitment to authentic flavors. Each batch of curry paste is made fresh daily using traditional mortar and pestle methods.',

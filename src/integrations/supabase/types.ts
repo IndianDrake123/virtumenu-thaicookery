@@ -9,6 +9,318 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      allergens: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      dish_stories: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          menu_item_id: string | null
+          story: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          menu_item_id?: string | null
+          story: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          menu_item_id?: string | null
+          story?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dish_stories_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
+      menu_items: {
+        Row: {
+          calories: number | null
+          category_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          is_gluten_free: boolean
+          is_popular: boolean
+          is_spicy: boolean
+          is_vegetarian: boolean
+          name: string
+          price: number
+          protein: number | null
+          slug: string
+          sort_order: number | null
+          sourcing: string | null
+        }
+        Insert: {
+          calories?: number | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_gluten_free?: boolean
+          is_popular?: boolean
+          is_spicy?: boolean
+          is_vegetarian?: boolean
+          name: string
+          price: number
+          protein?: number | null
+          slug: string
+          sort_order?: number | null
+          sourcing?: string | null
+        }
+        Update: {
+          calories?: number | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_gluten_free?: boolean
+          is_popular?: boolean
+          is_spicy?: boolean
+          is_vegetarian?: boolean
+          name?: string
+          price?: number
+          protein?: number | null
+          slug?: string
+          sort_order?: number | null
+          sourcing?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "menu_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_items_allergens: {
+        Row: {
+          allergen_id: string
+          menu_item_id: string
+        }
+        Insert: {
+          allergen_id: string
+          menu_item_id: string
+        }
+        Update: {
+          allergen_id?: string
+          menu_item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_allergens_allergen_id_fkey"
+            columns: ["allergen_id"]
+            isOneToOne: false
+            referencedRelation: "allergens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_items_allergens_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_items_option_groups: {
+        Row: {
+          menu_item_id: string
+          option_group_id: string
+        }
+        Insert: {
+          menu_item_id: string
+          option_group_id: string
+        }
+        Update: {
+          menu_item_id?: string
+          option_group_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_option_groups_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_items_option_groups_option_group_id_fkey"
+            columns: ["option_group_id"]
+            isOneToOne: false
+            referencedRelation: "option_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_items_tags: {
+        Row: {
+          menu_item_id: string
+          tag_id: string
+        }
+        Insert: {
+          menu_item_id: string
+          tag_id: string
+        }
+        Update: {
+          menu_item_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_tags_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_items_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      option_choices: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          option_group_id: string | null
+          price_adjustment: number
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          option_group_id?: string | null
+          price_adjustment?: number
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          option_group_id?: string | null
+          price_adjustment?: number
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "option_choices_option_group_id_fkey"
+            columns: ["option_group_id"]
+            isOneToOne: false
+            referencedRelation: "option_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      option_groups: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          is_required: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
       search_suggestions: {
         Row: {
           created_at: string | null
@@ -39,6 +351,36 @@ export type Database = {
           sort_order?: number | null
           text?: string
           type?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
         }
         Relationships: []
       }

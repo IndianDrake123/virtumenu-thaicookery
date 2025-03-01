@@ -5,20 +5,33 @@ import Layout from "@/components/Layout";
 import MenuCategory from "@/components/MenuCategory";
 import SearchBar from "@/components/SearchBar";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "lucide-react";
-import { menuCategories } from "@/data/menuData";
 import MenuItem from "@/components/MenuItem";
 import { trackUserInteraction } from "@/utils/analytics";
 import { useCart } from "@/context/CartContext";
+import { useMenuCategories, useMenuSearch } from "@/hooks/useMenu";
+import { MenuCategoryWithItems } from "@/models/types";
+import { MenuCategory as FrontendMenuCategory } from "@/data/menuData";
 
 const Menu = () => {
   const navigate = useNavigate();
-  const [activeCategory, setActiveCategory] = useState("starters");
+  const [activeCategory, setActiveCategory] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchResults, setSearchResults] = useState<any>(null);
   const [currentQuery, setCurrentQuery] = useState('');
   const [showCartTooltip, setShowCartTooltip] = useState(false);
   const { itemCount } = useCart();
   const categoryScrollRef = useRef<HTMLDivElement>(null);
+
+  // Fetch menu categories from database
+  const { categories, loading: categoriesLoading, error: categoriesError } = useMenuCategories();
+  const { items: searchItems, loading: searchLoading } = useMenuSearch(currentQuery);
+
+  // Set initial active category once categories are loaded
+  useEffect(() => {
+    if (categories.length > 0 && activeCategory === "") {
+      setActiveCategory(categories[0].slug);
+    }
+  }, [categories, activeCategory]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -80,8 +93,60 @@ const Menu = () => {
     trackUserInteraction('navigate_to_about', { from: 'menu' });
   };
 
+  // Convert database category to frontend format
+  const convertCategoryToFrontendFormat = (dbCategory: MenuCategoryWithItems): FrontendMenuCategory => {
+    return {
+      id: dbCategory.slug,
+      name: dbCategory.name,
+      description: dbCategory.description || undefined,
+      image: dbCategory.image_url,
+      items: dbCategory.items.map(item => ({
+        id: item.slug,
+        name: item.name,
+        description: item.description || "",
+        price: Number(item.price),
+        image: item.image_url,
+        popular: item.is_popular,
+        spicy: item.is_spicy,
+        vegetarian: item.is_vegetarian,
+        glutenFree: item.is_gluten_free,
+        protein: item.protein ? Number(item.protein) : undefined,
+        calories: item.calories,
+        allergens: item.allergens?.map(a => a.name),
+        sourcing: item.sourcing,
+      }))
+    };
+  };
+
   // Get the current selected category
-  const selectedCategory = menuCategories.find(cat => cat.id === activeCategory) || menuCategories[0];
+  const selectedCategory = categories.find(cat => cat.slug === activeCategory);
+  const frontendSelectedCategory = selectedCategory ? convertCategoryToFrontendFormat(selectedCategory) : undefined;
+
+  if (categoriesLoading && !isLoaded) {
+    return (
+      <Layout title="" showHeader={false}>
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#CA3F3F]"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (categoriesError) {
+    return (
+      <Layout title="" showHeader={false}>
+        <div className="flex flex-col items-center justify-center h-screen p-4">
+          <div className="text-red-500 mb-4">Failed to load menu data</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-[#CA3F3F] text-white px-4 py-2 rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="" showHeader={false}>
@@ -146,7 +211,7 @@ const Menu = () => {
               <h2 className="text-xl font-bold text-white">{searchResults.title || "Search Results"}</h2>
             </div>
             <div className="space-y-4">
-              {searchResults.items.map((item: any, index: number) => (
+              {searchItems.map((item, index) => (
                 <div 
                   key={item.id} 
                   className="animate-fade-in" 
@@ -155,7 +220,7 @@ const Menu = () => {
                   <MenuItem item={item} />
                 </div>
               ))}
-              {searchResults.items.length === 0 && (
+              {searchItems.length === 0 && (
                 <p className="text-center text-gray-400 py-4">No items found matching your search.</p>
               )}
               
@@ -184,27 +249,27 @@ const Menu = () => {
                 className="flex overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory scroll-smooth px-2"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                {menuCategories.map((category, index) => (
+                {categories.map((category, index) => (
                   <div 
                     key={category.id}
                     className={`flex-shrink-0 w-28 mx-1.5 snap-center cursor-pointer transition-all duration-300 ${
-                      activeCategory === category.id ? "scale-105" : "opacity-70 hover:opacity-100"
+                      activeCategory === category.slug ? "scale-105" : "opacity-70 hover:opacity-100"
                     }`}
-                    onClick={() => handleCategoryChange(category.id)}
+                    onClick={() => handleCategoryChange(category.slug)}
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <div className={`aspect-square rounded-lg overflow-hidden mb-2 border-2 shadow-md transform transition-all duration-300 ${
-                      activeCategory === category.id 
+                      activeCategory === category.slug 
                         ? "border-[#CA3F3F] shadow-[0_0_10px_rgba(202,63,63,0.3)]" 
                         : "border-transparent hover:border-white/50"
                     }`}>
                       <div className="w-full h-full flex items-center justify-center bg-[#CA3F3F] text-white overflow-hidden">
-                        {category.image ? (
+                        {category.image_url ? (
                           <img 
-                            src={category.image} 
+                            src={category.image_url} 
                             alt={category.name} 
                             className={`w-full h-full object-cover transition-all duration-500 ${
-                              activeCategory === category.id ? "scale-110" : "scale-100"
+                              activeCategory === category.slug ? "scale-110" : "scale-100"
                             }`} 
                           />
                         ) : (
@@ -227,22 +292,26 @@ const Menu = () => {
             </div>
 
             {/* Active Category Header */}
-            <div className="bg-[#CA3F3F] py-4 px-4 rounded-t-xl shadow-lg backdrop-blur-sm animate-fade-in" style={{ animationDelay: "400ms" }}>
-              <h2 className="text-xl font-bold text-white tracking-wide">{selectedCategory.name}</h2>
-              {selectedCategory.description && (
-                <p className="text-white/90 text-sm">{selectedCategory.description}</p>
-              )}
-            </div>
+            {frontendSelectedCategory && (
+              <div className="bg-[#CA3F3F] py-4 px-4 rounded-t-xl shadow-lg backdrop-blur-sm animate-fade-in" style={{ animationDelay: "400ms" }}>
+                <h2 className="text-xl font-bold text-white tracking-wide">{frontendSelectedCategory.name}</h2>
+                {frontendSelectedCategory.description && (
+                  <p className="text-white/90 text-sm">{frontendSelectedCategory.description}</p>
+                )}
+              </div>
+            )}
 
             {/* Menu Items for Selected Category */}
-            <div className="space-y-3 px-2 pb-10 animate-fade-in" style={{ animationDelay: "500ms" }}>
-              <MenuCategory
-                key={selectedCategory.id}
-                category={selectedCategory}
-                expanded={true}
-                showViewAll={false}
-              />
-            </div>
+            {frontendSelectedCategory && (
+              <div className="space-y-3 px-2 pb-10 animate-fade-in" style={{ animationDelay: "500ms" }}>
+                <MenuCategory
+                  key={frontendSelectedCategory.id}
+                  category={frontendSelectedCategory}
+                  expanded={true}
+                  showViewAll={false}
+                />
+              </div>
+            )}
           </>
         )}
       </div>
