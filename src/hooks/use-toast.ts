@@ -1,4 +1,3 @@
-
 import * as React from "react"
 
 import type {
@@ -138,7 +137,7 @@ function dispatch(action: Action) {
   })
 }
 
-// Update the type definition to include 'success' as a valid variant
+// Define the ToastVariant type to include 'success'
 type ToastVariant = 'default' | 'destructive' | 'success';
 
 type Toast = Omit<ToasterToast, "id"> & {
@@ -151,12 +150,16 @@ function toast({ ...props }: Toast) {
   // Add custom styling class to make the toast more red
   const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
   
-  // Handle 'success' variant by converting it to 'default'
-  let variant = props.variant || 'default'
+  // Handle variants to ensure we only use ones that ToastProps accepts
+  let variant: 'default' | 'destructive' = 'default'
   
-  // Need to cast the variant to the allowed types from ToastProps
-  if (variant === 'success') {
-    variant = 'default'
+  // Map 'success' to 'default' or keep 'default'/'destructive' as is
+  if (props.variant) {
+    if (props.variant === 'success') {
+      variant = 'default'
+    } else if (props.variant === 'default' || props.variant === 'destructive') {
+      variant = props.variant
+    }
   }
 
   const update = (props: ToasterToast) =>
@@ -172,7 +175,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       className,
-      variant: variant as 'default' | 'destructive', // Cast to the allowed types for ToastProps
+      variant,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss()
