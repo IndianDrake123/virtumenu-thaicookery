@@ -138,9 +138,11 @@ function dispatch(action: Action) {
   })
 }
 
-// Update the type to include 'success' as a valid variant
+// Update the type definition to include 'success' as a valid variant
+type ToastVariant = 'default' | 'destructive' | 'success';
+
 type Toast = Omit<ToasterToast, "id"> & {
-  variant?: "default" | "destructive" | "success"
+  variant?: ToastVariant
 }
 
 function toast({ ...props }: Toast) {
@@ -150,11 +152,11 @@ function toast({ ...props }: Toast) {
   const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
   
   // Handle 'success' variant by converting it to 'default'
-  let variant = props.variant
+  let variant = props.variant || 'default'
   
-  // Fix the TypeScript error by explicitly checking against all possible values
+  // Need to cast the variant to the allowed types from ToastProps
   if (variant === 'success') {
-    variant = 'default' as const; // Use type assertion to fix the error
+    variant = 'default'
   }
 
   const update = (props: ToasterToast) =>
@@ -170,7 +172,7 @@ function toast({ ...props }: Toast) {
       ...props,
       id,
       className,
-      variant,
+      variant: variant as 'default' | 'destructive', // Cast to the allowed types for ToastProps
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss()
