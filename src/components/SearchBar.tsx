@@ -26,8 +26,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Fetch suggestions from Supabase
+  // Fetch suggestions from Supabase - ensure we're getting unique values
   const { suggestions: faqs, loading: suggestionsLoading, error: suggestionsError } = useSearchSuggestions();
+  
+  // Ensure we have unique suggestions by using a Set with the text as the key
+  const uniqueFaqs = faqs ? Array.from(
+    new Map(faqs.map(item => [item.text, item])).values()
+  ) : [];
 
   // Set query from prop if changed externally
   useEffect(() => {
@@ -43,25 +48,25 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   // Cycle through FAQs for placeholder text
   useEffect(() => {
-    if (!faqs || faqs.length === 0) return;
+    if (!uniqueFaqs || uniqueFaqs.length === 0) return;
     
     let currentIndex = 0;
     
     const cycleTexts = () => {
-      if (faqs.length === 0) return;
+      if (uniqueFaqs.length === 0) return;
       
       setPlaceholderAnimating(true);
       setTimeout(() => {
-        setPlaceholderText(faqs[currentIndex].text);
+        setPlaceholderText(uniqueFaqs[currentIndex].text);
         setPlaceholderAnimating(false);
         
-        currentIndex = (currentIndex + 1) % faqs.length;
+        currentIndex = (currentIndex + 1) % uniqueFaqs.length;
       }, 500);
     };
     
     // Set initial placeholder text
-    if (faqs.length > 0) {
-      setPlaceholderText(faqs[0].text);
+    if (uniqueFaqs.length > 0) {
+      setPlaceholderText(uniqueFaqs[0].text);
     }
     
     const interval = setInterval(cycleTexts, 5000);
@@ -69,7 +74,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     return () => {
       clearInterval(interval);
     };
-  }, [faqs]);
+  }, [uniqueFaqs]);
 
   // Close suggestions on click outside
   useEffect(() => {
@@ -208,15 +213,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
           ref={suggestionsRef}
           className="absolute z-20 mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl overflow-hidden animate-in fade-in duration-300"
         >
-          {/* FAQs and search suggestions */}
-          {faqs && faqs.length > 0 && (
+          {/* Show unique FAQs and search suggestions */}
+          {uniqueFaqs && uniqueFaqs.length > 0 && (
             <div className="border-t border-white/5">
               <div className="p-4">
                 <h3 className="text-gray-400 text-xs font-medium mb-2">
                   SUGGESTED SEARCHES
                 </h3>
                 <div className="space-y-2">
-                  {faqs.map((faq) => (
+                  {uniqueFaqs.map((faq) => (
                     <button
                       key={faq.id}
                       onClick={() => handleSuggestionClick(faq.text)}
