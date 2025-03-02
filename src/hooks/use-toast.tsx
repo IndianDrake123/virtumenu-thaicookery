@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -216,13 +217,13 @@ function cartNotification(item: string, quantity: number = 1) {
           <span className="ml-1 px-1.5 py-0.5 bg-[#C84C37] text-white text-[10px] rounded-sm font-medium">Success</span>
         </span>
       </div>
-    ),
+    ) as unknown as string,
     description: (
       <div className="mt-1">
         <div className="text-xs text-gray-700">{quantity} × {item}</div>
         <a href="/cart" className="text-xs text-[#C84C37] hover:underline">Click to view cart</a>
       </div>
-    ),
+    ) as unknown as string,
   });
 }
 
