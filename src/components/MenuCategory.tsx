@@ -9,12 +9,14 @@ interface MenuCategoryProps {
   category: MenuCategoryType;
   expanded?: boolean;
   showViewAll?: boolean;
+  hideHeader?: boolean;
 }
 
 const MenuCategory: React.FC<MenuCategoryProps> = ({
   category,
   expanded = false,
-  showViewAll = true
+  showViewAll = true,
+  hideHeader = false
 }) => {
   const [isOpen, setIsOpen] = useState(expanded);
   const [itemsVisible, setItemsVisible] = useState(expanded);
@@ -39,7 +41,7 @@ const MenuCategory: React.FC<MenuCategoryProps> = ({
 
   return (
     <div className="mb-6">
-      {!expanded && (
+      {!expanded && !hideHeader && (
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="w-full flex items-center justify-between p-3 transition-all duration-300"

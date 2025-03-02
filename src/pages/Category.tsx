@@ -92,7 +92,7 @@ const Category = () => {
       >
         {/* Category Header */}
         <div className="py-4 px-4 mb-4">
-          <h2 className="text-sm font-medium text-white tracking-wide">{category.name}</h2>
+          <h2 className="text-lg font-medium text-white tracking-wide">{category.name}</h2>
           <div className="h-0.5 bg-[#ea384c] w-20 mt-1"></div>
           {category.description && (
             <p className="text-white/80 text-xs mt-2">{category.description}</p>
@@ -103,6 +103,7 @@ const Category = () => {
           category={frontendCategory}
           expanded={true}
           showViewAll={false}
+          hideHeader={true}
         />
       </div>
     </Layout>

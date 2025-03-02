@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
@@ -106,6 +107,9 @@ const Menu = () => {
 
   const selectedCategory = categories.find(cat => cat.slug === activeCategory);
   const frontendSelectedCategory = selectedCategory ? convertCategoryToFrontendFormat(selectedCategory) : undefined;
+
+  // Filter out categories with no items
+  const filteredCategories = categories.filter(category => category.items && category.items.length > 0);
 
   if (categoriesLoading && !isLoaded) {
     return (
@@ -229,7 +233,7 @@ const Menu = () => {
                 className="flex overflow-x-auto py-2 hide-scrollbar snap-x snap-mandatory scroll-smooth px-5"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
               >
-                {categories.map((category, index) => (
+                {filteredCategories.map((category, index) => (
                   <div 
                     key={category.id}
                     className={`flex-shrink-0 snap-center cursor-pointer transition-all duration-300 mx-4 ${
@@ -257,18 +261,8 @@ const Menu = () => {
               </button>
             </div>
 
-            {frontendSelectedCategory && (
-              <div className="py-3 px-4 animate-fade-in" style={{ animationDelay: "400ms" }}>
-                <h2 className="text-sm font-medium text-white tracking-wide">{frontendSelectedCategory.name}</h2>
-                <div className="h-0.5 bg-[#ea384c] w-20 mt-1"></div>
-                {frontendSelectedCategory.description && (
-                  <p className="text-white/80 text-xs mt-2">{frontendSelectedCategory.description}</p>
-                )}
-              </div>
-            )}
-
-            {frontendSelectedCategory && (
-              <div className="space-y-3 px-2 pb-10 animate-fade-in" style={{ animationDelay: "500ms" }}>
+            {frontendSelectedCategory && frontendSelectedCategory.items.length > 0 && (
+              <div className="space-y-3 px-4 pb-10 animate-fade-in" style={{ animationDelay: "500ms" }}>
                 <MenuCategory
                   key={frontendSelectedCategory.id}
                   category={frontendSelectedCategory}
