@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Search, X, Clock, Flame, Star } from "lucide-react";
 import { useSearchSuggestions } from "@/utils/searchSuggestions";
@@ -20,6 +21,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [query, setQuery] = useState(currentSearchQuery);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [currentFaqIndex, setCurrentFaqIndex] = useState(0);
+  const [placeholderText, setPlaceholderText] = useState("Search menu...");
+  const [isAnimating, setIsAnimating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +41,37 @@ const SearchBar: React.FC<SearchBarProps> = ({
       inputRef.current.focus();
     }
   }, [isExpanded]);
+
+  // Rotate through FAQs for placeholder text
+  useEffect(() => {
+    if (!faqs || faqs.length === 0) return;
+
+    const rotatePlaceholders = () => {
+      setIsAnimating(true);
+      
+      // After animation starts, wait and then change text
+      setTimeout(() => {
+        const nextIndex = (currentFaqIndex + 1) % faqs.length;
+        setCurrentFaqIndex(nextIndex);
+        setPlaceholderText(faqs[nextIndex].text);
+        
+        // Reset animation state after text change
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 300);
+      }, 300);
+    };
+
+    // Set initial FAQ text after loading
+    if (faqs.length > 0 && placeholderText === "Search menu...") {
+      setPlaceholderText(faqs[0].text);
+    }
+
+    // Set up the rotation interval
+    const interval = setInterval(rotatePlaceholders, 5000);
+    
+    return () => clearInterval(interval);
+  }, [faqs, currentFaqIndex]);
 
   // Close suggestions on click outside
   useEffect(() => {
@@ -59,9 +94,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleFocus = () => {
     setIsExpanded(true);
-    if (query.length > 0) {
-      setShowSuggestions(true);
-    }
+    setShowSuggestions(true); // Show suggestions immediately on focus
   };
 
   const handleClear = () => {
@@ -78,6 +111,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleSearchClick = () => {
     if (!isExpanded) {
       setIsExpanded(true);
+      setShowSuggestions(true); // Show suggestions immediately when expanded
       if (inputRef.current) {
         inputRef.current.focus();
       }
@@ -142,29 +176,40 @@ const SearchBar: React.FC<SearchBarProps> = ({
           <Search size={20} />
         </button>
         
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder="Search menu..."
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            if (e.target.value.length > 0) {
-              setShowSuggestions(true);
-            } else {
-              setShowSuggestions(false);
-            }
-          }}
-          onFocus={handleFocus}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSearch();
-            }
-          }}
-          className={`bg-transparent border-none focus:outline-none text-white placeholder-gray-500 text-sm flex-grow transition-all duration-300 ${
-            isExpanded ? "px-3 w-full" : "px-1 w-0"
-          }`}
-        />
+        <div className="relative flex-grow">
+          <div 
+            className={`absolute inset-0 flex items-center ${
+              isAnimating ? 'search-placeholder-out' : 'search-placeholder-in'
+            }`}
+            style={{ pointerEvents: 'none', display: query ? 'none' : 'flex' }}
+          >
+            <span className="text-gray-500 text-sm truncate ml-3">
+              {placeholderText}
+            </span>
+          </div>
+          
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder=""
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              if (e.target.value.length > 0) {
+                setShowSuggestions(true);
+              }
+            }}
+            onFocus={handleFocus}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch();
+              }
+            }}
+            className={`bg-transparent border-none focus:outline-none text-white text-sm flex-grow transition-all duration-300 ${
+              isExpanded ? "px-3 w-full" : "px-1 w-0"
+            }`}
+          />
+        </div>
         
         {isExpanded && query && (
           <button 
