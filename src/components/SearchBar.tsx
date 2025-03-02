@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
-import { Search, X, Clock, Flame, Star } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useSearchSuggestions } from "@/utils/searchSuggestions";
 import { searchMenuItems } from "@/services/menuService";
 import { trackUserInteraction } from "@/utils/analytics";
@@ -21,6 +21,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [query, setQuery] = useState(currentSearchQuery);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [placeholderText, setPlaceholderText] = useState("Search menu...");
+  const [placeholderAnimating, setPlaceholderAnimating] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +40,36 @@ const SearchBar: React.FC<SearchBarProps> = ({
       inputRef.current.focus();
     }
   }, [isExpanded]);
+
+  // Cycle through FAQs for placeholder text
+  useEffect(() => {
+    if (!faqs || faqs.length === 0) return;
+    
+    let currentIndex = 0;
+    
+    const cycleTexts = () => {
+      if (faqs.length === 0) return;
+      
+      setPlaceholderAnimating(true);
+      setTimeout(() => {
+        setPlaceholderText(faqs[currentIndex].text);
+        setPlaceholderAnimating(false);
+        
+        currentIndex = (currentIndex + 1) % faqs.length;
+      }, 500);
+    };
+    
+    // Set initial placeholder text
+    if (faqs.length > 0) {
+      setPlaceholderText(faqs[0].text);
+    }
+    
+    const interval = setInterval(cycleTexts, 5000);
+    
+    return () => {
+      clearInterval(interval);
+    };
+  }, [faqs]);
 
   // Close suggestions on click outside
   useEffect(() => {
@@ -60,9 +92,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleFocus = () => {
     setIsExpanded(true);
-    if (query.length > 0) {
-      setShowSuggestions(true);
-    }
+    setShowSuggestions(true); // Show suggestions immediately on focus
   };
 
   const handleClear = () => {
@@ -79,6 +109,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleSearchClick = () => {
     if (!isExpanded) {
       setIsExpanded(true);
+      setShowSuggestions(true); // Show suggestions immediately when clicking search
       if (inputRef.current) {
         inputRef.current.focus();
       }
@@ -121,13 +152,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-  const recentSearches = [
-    "Pad Thai", 
-    "Curry", 
-    "Vegetarian", 
-    "Spicy"
-  ];
-
   return (
     <div className="relative w-full">
       <div 
@@ -146,14 +170,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search menu..."
+          placeholder={placeholderText}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
             if (e.target.value.length > 0) {
               setShowSuggestions(true);
             } else {
-              setShowSuggestions(false);
+              setShowSuggestions(true); // Keep suggestions visible even when input is empty
             }
           }}
           onFocus={handleFocus}
@@ -164,7 +188,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           }}
           className={`bg-transparent border-none focus:outline-none text-white placeholder-gray-500 text-sm flex-grow transition-all duration-300 ${
             isExpanded ? "px-3 w-full" : "px-1 w-0"
-          }`}
+          } ${placeholderAnimating ? "animate-placeholder-fade" : ""}`}
         />
         
         {isExpanded && query && (
@@ -178,64 +202,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
         )}
       </div>
       
-      {/* Search Suggestions Panel */}
+      {/* Search Suggestions Panel - Only show Suggested Searches */}
       {showSuggestions && (
         <div 
           ref={suggestionsRef}
           className="absolute z-20 mt-1 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl overflow-hidden animate-in fade-in duration-300"
         >
-          {/* Recent searches */}
-          <div className="p-4">
-            <h3 className="text-gray-400 text-xs font-medium mb-2 flex items-center">
-              <Clock size={14} className="mr-1" />
-              RECENT SEARCHES
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {recentSearches.map((search, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSuggestionClick(search)}
-                  className="text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full text-sm transition-colors"
-                >
-                  {search}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          {/* Popular and suggestions */}
-          <div className="border-t border-white/5">
-            <div className="p-4">
-              <h3 className="text-gray-400 text-xs font-medium mb-2 flex items-center">
-                <Flame size={14} className="mr-1" />
-                POPULAR DISHES
-              </h3>
-              <div className="space-y-2">
-                <button
-                  onClick={() => handleSuggestionClick("Green Curry")}
-                  className="w-full text-left text-white hover:bg-white/5 p-2 rounded flex items-center transition-colors"
-                >
-                  <Star className="text-yellow-500 mr-2" size={16} />
-                  Green Curry
-                </button>
-                <button
-                  onClick={() => handleSuggestionClick("Pad Thai")}
-                  className="w-full text-left text-white hover:bg-white/5 p-2 rounded flex items-center transition-colors"
-                >
-                  <Star className="text-yellow-500 mr-2" size={16} />
-                  Pad Thai
-                </button>
-                <button
-                  onClick={() => handleSuggestionClick("Thai Spring Rolls")}
-                  className="w-full text-left text-white hover:bg-white/5 p-2 rounded flex items-center transition-colors"
-                >
-                  <Star className="text-yellow-500 mr-2" size={16} />
-                  Thai Spring Rolls
-                </button>
-              </div>
-            </div>
-          </div>
-          
           {/* FAQs and search suggestions */}
           {faqs && faqs.length > 0 && (
             <div className="border-t border-white/5">
