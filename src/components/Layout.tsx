@@ -1,7 +1,6 @@
 
 import React, { ReactNode, useState, useEffect } from "react";
 import Header from "./Header";
-import SearchBar from "./SearchBar";
 
 interface LayoutProps {
   children: ReactNode;
