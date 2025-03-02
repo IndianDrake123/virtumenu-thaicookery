@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Search, X, Clock, Flame, Star } from "lucide-react";
 import { useSearchSuggestions } from "@/utils/searchSuggestions";
