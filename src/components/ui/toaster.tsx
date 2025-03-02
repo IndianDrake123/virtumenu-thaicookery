@@ -1,4 +1,4 @@
-import { useToast } from "@/hooks/use-toast"
+
 import {
   Toast,
   ToastClose,
@@ -6,7 +6,10 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
+  ToastSuccessIcon,
+  ToastCartIcon,
 } from "@/components/ui/toast"
+import { useToast } from "@/hooks/use-toast"
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -15,11 +18,28 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
+          <Toast key={id} {...props} className="toast-animation-enter data-[state=closed]:toast-animation-leave">
+            <div className="flex">
+              {props.variant === "success" && (
+                <>
+                  <ToastCartIcon />
+                  <div>
+                    {title && <ToastTitle>{title}</ToastTitle>}
+                    {description && (
+                      <ToastDescription>{description}</ToastDescription>
+                    )}
+                  </div>
+                </>
+              )}
+              {props.variant !== "success" && (
+                <>
+                  <div className="grid gap-1">
+                    {title && <ToastTitle>{title}</ToastTitle>}
+                    {description && (
+                      <ToastDescription>{description}</ToastDescription>
+                    )}
+                  </div>
+                </>
               )}
             </div>
             {action}

@@ -7,7 +7,7 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 5000
+const TOAST_REMOVE_DELAY = 3000
 
 type ToasterToast = ToastProps & {
   id: string
@@ -147,23 +147,16 @@ type Toast = Omit<ToasterToast, "id"> & {
 
 function toast({ ...props }: Toast) {
   const id = genId()
-
-  // Add custom styling class to make the toast more red
-  const className = props.className ? `${props.className} bg-[#CA3F3F]/95 text-white border-[#CA3F3F]` : 'bg-[#CA3F3F]/95 text-white border-[#CA3F3F]'
   
-  // Handle variants to ensure we only use ones that ToastProps accepts
-  let variant: 'default' | 'destructive' = 'default'
+  // Map 'success' to the new success variant
+  let variant: 'default' | 'destructive' | 'success' = 'default'
   
-  // Map 'success' to 'default' or keep 'default'/'destructive' as is
   if (props.variant) {
-    if (props.variant === 'success' as ToastVariant) {
-      // Success is not a supported variant in the underlying component,
-      // so we map it to 'default' but could add special styling if needed
-      variant = 'default'
-    } else if (props.variant === 'destructive' as ToastVariant) {
+    if (props.variant === 'success') {
+      variant = 'success'
+    } else if (props.variant === 'destructive') {
       variant = 'destructive'
     }
-    // For any other case, default to 'default'
   }
 
   const update = (props: ToasterToast) =>
@@ -178,7 +171,6 @@ function toast({ ...props }: Toast) {
     toast: {
       ...props,
       id,
-      className,
       variant,
       open: true,
       onOpenChange: (open) => {
@@ -214,4 +206,25 @@ function useToast() {
   }
 }
 
-export { useToast, toast }
+// Helper function for cart notifications
+function cartNotification(item: string, quantity: number = 1) {
+  return toast({
+    variant: "success",
+    title: (
+      <div className="flex items-center">
+        <span className="inline-flex items-center">
+          <span className="flex-none">Added to cart</span>
+          <span className="ml-1 px-1.5 py-0.5 bg-[#C84C37] text-white text-[10px] rounded-sm font-medium">Success</span>
+        </span>
+      </div>
+    ),
+    description: (
+      <div className="mt-1">
+        <div className="text-xs text-gray-700">{quantity} × {item}</div>
+        <a href="/cart" className="text-xs text-[#C84C37] hover:underline">Click to view cart</a>
+      </div>
+    ),
+  });
+}
+
+export { useToast, toast, cartNotification }
